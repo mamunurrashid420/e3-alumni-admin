@@ -158,6 +158,13 @@ class ApiClient {
     );
     return response.data;
   }
+
+  async getMember(id: number): Promise<{ data: Member }> {
+    const response = await this.client.get<{ data: Member }>(
+      endpoints.member(id)
+    );
+    return response.data;
+  }
 }
 
 export const apiClient = new ApiClient();

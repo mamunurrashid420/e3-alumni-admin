@@ -9,6 +9,7 @@ import { DashboardPage } from '@/pages/DashboardPage';
 import { ApplicationsListPage } from '@/pages/ApplicationsListPage';
 import { ApplicationDetailPage } from '@/pages/ApplicationDetailPage';
 import { MembersListPage } from '@/pages/MembersListPage';
+import { MemberDetailPage } from '@/pages/MemberDetailPage';
 import { useAuthStore } from '@/stores/authStore';
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
             <Route path="applications" element={<ApplicationsListPage />} />
             <Route path="applications/:id" element={<ApplicationDetailPage />} />
             <Route path="members" element={<MembersListPage />} />
+            <Route path="members/:id" element={<MemberDetailPage />} />
           </Route>
           <Route path="*" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />} />
         </Routes>

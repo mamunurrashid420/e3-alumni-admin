@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMembers } from '@/hooks/useMembers';
 import type { MembershipType } from '@/types/api';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,7 @@ import { formatDate } from '@/lib/format';
 import { Search, X } from 'lucide-react';
 
 export function MembersListPage() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [primaryMemberType, setPrimaryMemberType] = useState<
     MembershipType | undefined
@@ -182,7 +184,11 @@ export function MembersListPage() {
                 </TableHeader>
                 <TableBody>
                   {members.map((member) => (
-                    <TableRow key={member.id}>
+                    <TableRow
+                      key={member.id}
+                      className="cursor-pointer hover:bg-gray-50"
+                      onClick={() => navigate(`/members/${member.id}`)}
+                    >
                       <TableCell className="font-medium">{member.id}</TableCell>
                       <TableCell>{member.name}</TableCell>
                       <TableCell>{member.email}</TableCell>

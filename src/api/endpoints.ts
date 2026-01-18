@@ -18,4 +18,5 @@ export const endpoints = {
 
   // Members
   members: `${API_BASE}/members`,
+  member: (id: number) => `${API_BASE}/members/${id}`,
 } as const;
