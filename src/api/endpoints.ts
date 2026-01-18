@@ -15,4 +15,7 @@ export const endpoints = {
     `${API_BASE}/membership-applications/${id}/approve`,
   rejectApplication: (id: number) =>
     `${API_BASE}/membership-applications/${id}/reject`,
+
+  // Members
+  members: `${API_BASE}/members`,
 } as const;

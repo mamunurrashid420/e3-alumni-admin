@@ -129,3 +129,22 @@ export interface ApiError {
 export interface LogoutResponse {
   message: string;
 }
+
+export interface SecondaryMemberType {
+  id: number;
+  name: string;
+  description: string;
+}
+
+export interface Member {
+  id: number;
+  name: string;
+  email: string;
+  role: 'member';
+  primary_member_type: MembershipType | null;
+  secondary_member_type: SecondaryMemberType | null;
+  member_id: string | null;
+  email_verified_at: string | null;
+  created_at: string;
+  updated_at: string;
+}

@@ -11,6 +11,8 @@ import type {
   ApiError,
   LogoutResponse,
   ApplicationStatus,
+  Member,
+  MembershipType,
 } from '@/types/api';
 import { endpoints } from './endpoints';
 
@@ -135,6 +137,24 @@ class ApiClient {
   ): Promise<RejectApplicationResponse> {
     const response = await this.client.post<RejectApplicationResponse>(
       endpoints.rejectApplication(id)
+    );
+    return response.data;
+  }
+
+  // Member Management
+  async getMembers(
+    search?: string,
+    primaryMemberType?: MembershipType,
+    page: number = 1
+  ): Promise<PaginatedResponse<Member>> {
+    const params: Record<string, string> = {};
+    if (search) params.search = search;
+    if (primaryMemberType) params.primary_member_type = primaryMemberType;
+    if (page > 1) params.page = page.toString();
+    
+    const response = await this.client.get<PaginatedResponse<Member>>(
+      endpoints.members,
+      { params }
     );
     return response.data;
   }
