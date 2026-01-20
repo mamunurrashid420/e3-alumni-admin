@@ -2,6 +2,17 @@
 
 export type ApplicationStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
+export type PaymentStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+export type PaymentPurpose =
+  | 'ASSOCIATE_MEMBERSHIP_FEES'
+  | 'GENERAL_MEMBERSHIP_FEES'
+  | 'LIFETIME_MEMBERSHIP_FEES'
+  | 'SPECIAL_YEARLY_CONTRIBUTION_EXECUTIVE'
+  | 'DONATIONS'
+  | 'PATRON'
+  | 'OTHERS';
+
 export type MembershipType = 'GENERAL' | 'LIFETIME' | 'ASSOCIATE';
 
 export type Gender = 'MALE' | 'FEMALE' | 'OTHER';
@@ -147,4 +158,34 @@ export interface Member {
   email_verified_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface Payment {
+  id: number;
+  member_id: string | null;
+  name: string;
+  address: string;
+  mobile_number: string;
+  payment_purpose: PaymentPurpose;
+  payment_amount: number;
+  payment_proof_file: string | null;
+  status: PaymentStatus;
+  approved_by: number | null;
+  approved_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PaymentDetailResponse {
+  data: Payment;
+}
+
+export interface ApprovePaymentResponse {
+  message: string;
+  payment: Payment;
+}
+
+export interface RejectPaymentResponse {
+  message: string;
+  payment: Payment;
 }

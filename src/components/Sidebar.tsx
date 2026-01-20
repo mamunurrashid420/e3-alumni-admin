@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, FileText, Users } from 'lucide-react';
+import { LayoutDashboard, FileText, Users, CreditCard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function Sidebar() {
@@ -47,6 +47,20 @@ export function Sidebar() {
         >
           <Users className="w-5 h-5" />
           <span>Members</span>
+        </NavLink>
+        <NavLink
+          to="/payments"
+          className={({ isActive }) =>
+            cn(
+              'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
+              isActive
+                ? 'bg-blue-50 text-blue-700 font-medium'
+                : 'text-gray-700 hover:bg-gray-50'
+            )
+          }
+        >
+          <CreditCard className="w-5 h-5" />
+          <span>Payments</span>
         </NavLink>
       </nav>
     </aside>

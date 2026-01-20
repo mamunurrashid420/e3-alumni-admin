@@ -1,5 +1,7 @@
 import type {
   ApplicationStatus,
+  PaymentStatus,
+  PaymentPurpose,
   MembershipType,
   Gender,
   TShirtSize,
@@ -60,4 +62,36 @@ export const GENDER_LABELS: Record<Gender, string> = {
   MALE: 'Male',
   FEMALE: 'Female',
   OTHER: 'Other',
+};
+
+export const PAYMENT_STATUSES: PaymentStatus[] = [
+  'PENDING',
+  'APPROVED',
+  'REJECTED',
+];
+
+export const PAYMENT_PURPOSES: PaymentPurpose[] = [
+  'ASSOCIATE_MEMBERSHIP_FEES',
+  'GENERAL_MEMBERSHIP_FEES',
+  'LIFETIME_MEMBERSHIP_FEES',
+  'SPECIAL_YEARLY_CONTRIBUTION_EXECUTIVE',
+  'DONATIONS',
+  'PATRON',
+  'OTHERS',
+];
+
+export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
+  PENDING: 'Pending',
+  APPROVED: 'Approved',
+  REJECTED: 'Rejected',
+};
+
+export const PAYMENT_PURPOSE_LABELS: Record<PaymentPurpose, string> = {
+  ASSOCIATE_MEMBERSHIP_FEES: 'Associate Membership Fees',
+  GENERAL_MEMBERSHIP_FEES: 'General Membership Fees',
+  LIFETIME_MEMBERSHIP_FEES: 'Lifetime Membership Fees',
+  SPECIAL_YEARLY_CONTRIBUTION_EXECUTIVE: 'Special Yearly Contribution (Executive)',
+  DONATIONS: 'Donations',
+  PATRON: 'Patron',
+  OTHERS: 'Others',
 };

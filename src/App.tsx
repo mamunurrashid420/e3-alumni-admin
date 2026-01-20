@@ -10,6 +10,8 @@ import { ApplicationsListPage } from '@/pages/ApplicationsListPage';
 import { ApplicationDetailPage } from '@/pages/ApplicationDetailPage';
 import { MembersListPage } from '@/pages/MembersListPage';
 import { MemberDetailPage } from '@/pages/MemberDetailPage';
+import { PaymentsListPage } from '@/pages/PaymentsListPage';
+import { PaymentDetailPage } from '@/pages/PaymentDetailPage';
 import { useAuthStore } from '@/stores/authStore';
 
 function App() {
@@ -40,6 +42,8 @@ function App() {
             <Route path="applications/:id" element={<ApplicationDetailPage />} />
             <Route path="members" element={<MembersListPage />} />
             <Route path="members/:id" element={<MemberDetailPage />} />
+            <Route path="payments" element={<PaymentsListPage />} />
+            <Route path="payments/:id" element={<PaymentDetailPage />} />
           </Route>
           <Route path="*" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />} />
         </Routes>

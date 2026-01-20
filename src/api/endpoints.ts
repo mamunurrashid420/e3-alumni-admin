@@ -19,4 +19,10 @@ export const endpoints = {
   // Members
   members: `${API_BASE}/members`,
   member: (id: number) => `${API_BASE}/members/${id}`,
+
+  // Payments
+  payments: `${API_BASE}/payments`,
+  payment: (id: number) => `${API_BASE}/payments/${id}`,
+  approvePayment: (id: number) => `${API_BASE}/payments/${id}/approve`,
+  rejectPayment: (id: number) => `${API_BASE}/payments/${id}/reject`,
 } as const;

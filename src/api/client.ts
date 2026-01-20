@@ -13,6 +13,11 @@ import type {
   ApplicationStatus,
   Member,
   MembershipType,
+  Payment,
+  PaymentStatus,
+  PaymentDetailResponse,
+  ApprovePaymentResponse,
+  RejectPaymentResponse,
 } from '@/types/api';
 import { endpoints } from './endpoints';
 
@@ -162,6 +167,48 @@ class ApiClient {
   async getMember(id: number): Promise<{ data: Member }> {
     const response = await this.client.get<{ data: Member }>(
       endpoints.member(id)
+    );
+    return response.data;
+  }
+
+  // Payment Management
+  async getPayments(status?: PaymentStatus): Promise<PaginatedResponse<Payment>> {
+    const params = status ? { status } : {};
+    const response = await this.client.get<PaginatedResponse<Payment>>(
+      endpoints.payments,
+      { params }
+    );
+    return response.data;
+  }
+
+  async getPayment(id: number): Promise<PaymentDetailResponse> {
+    const response = await this.client.get<PaymentDetailResponse>(
+      endpoints.payment(id)
+    );
+    return response.data;
+  }
+
+  async updatePayment(
+    id: number,
+    data: Partial<Payment>
+  ): Promise<PaymentDetailResponse> {
+    const response = await this.client.put<PaymentDetailResponse>(
+      endpoints.payment(id),
+      data
+    );
+    return response.data;
+  }
+
+  async approvePayment(id: number): Promise<ApprovePaymentResponse> {
+    const response = await this.client.post<ApprovePaymentResponse>(
+      endpoints.approvePayment(id)
+    );
+    return response.data;
+  }
+
+  async rejectPayment(id: number): Promise<RejectPaymentResponse> {
+    const response = await this.client.post<RejectPaymentResponse>(
+      endpoints.rejectPayment(id)
     );
     return response.data;
   }
