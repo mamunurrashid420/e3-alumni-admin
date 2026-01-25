@@ -88,7 +88,7 @@ class ApiClient {
   // Authentication methods
   async login(email: string, password: string): Promise<LoginResponse> {
     const response = await this.client.post<LoginResponse>(endpoints.login, {
-      email,
+      email_or_phone: email,
       password,
     });
     if (response.data.token) {
