@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { AuthenticatedImage } from '@/components/AuthenticatedImage';
 import { apiClient } from '@/api/client';
 import type { MembershipApplication } from '@/types/api';
 import { Button } from '@/components/ui/button';
@@ -279,14 +280,13 @@ export function ApplicationDetailPage() {
                 <p className="text-sm font-medium text-gray-500">
                   Studentship Proof File
                 </p>
-                <a
-                  href={application.studentship_proof_file}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
-                >
-                  View File
-                </a>
+                <div className="mt-2">
+                  <AuthenticatedImage
+                    src={application.studentship_proof_file}
+                    alt="Studentship Proof"
+                    className="max-w-md h-auto rounded-lg border border-gray-200"
+                  />
+                </div>
               </div>
             )}
           </CardContent>
@@ -373,14 +373,13 @@ export function ApplicationDetailPage() {
             {application.receipt_file && (
               <div>
                 <p className="text-sm font-medium text-gray-500">Receipt File</p>
-                <a
-                  href={application.receipt_file}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
-                >
-                  View Receipt
-                </a>
+                <div className="mt-2">
+                  <AuthenticatedImage
+                    src={application.receipt_file}
+                    alt="Receipt"
+                    className="max-w-md h-auto rounded-lg border border-gray-200"
+                  />
+                </div>
               </div>
             )}
           </CardContent>
