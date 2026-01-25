@@ -28,6 +28,7 @@ import {
 import { formatDate, formatCurrency } from '@/lib/format';
 import { handleApiError } from '@/lib/errorHandler';
 import { toast } from 'sonner';
+import { AuthenticatedImage } from '@/components/AuthenticatedImage';
 
 export function PaymentDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -201,15 +202,12 @@ export function PaymentDetailPage() {
             </div>
             {payment.payment_proof_file && (
               <div>
-                <p className="text-sm font-medium text-gray-500">Payment Proof</p>
-                <a
-                  href={payment.payment_proof_file}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
-                >
-                  View Payment Proof
-                </a>
+                <p className="text-sm font-medium text-gray-500 mb-2">Payment Proof</p>
+                <AuthenticatedImage
+                  src={payment.payment_proof_file}
+                  alt="Payment Proof"
+                  className="max-w-full h-auto rounded-lg border border-gray-200 max-h-[400px] object-contain"
+                />
               </div>
             )}
           </CardContent>
