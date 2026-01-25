@@ -2,6 +2,8 @@
 
 export type ApplicationStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
+export type SelfDeclarationStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
 export type PaymentStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 export type PaymentPurpose =
@@ -188,4 +190,48 @@ export interface ApprovePaymentResponse {
 export interface RejectPaymentResponse {
   message: string;
   payment: Payment;
+}
+
+export interface MemberType {
+  id: number;
+  name: string;
+  description: string | null;
+}
+
+export interface SelfDeclaration {
+  id: number;
+  user?: {
+    id: number;
+    name: string;
+    email: string | null;
+    phone: string | null;
+    member_id: string | null;
+  };
+  name: string;
+  signature_file: string | null;
+  secondary_member_type?: MemberType;
+  date: string;
+  status: SelfDeclarationStatus;
+  approved_by?: {
+    id: number;
+    name: string;
+  };
+  approved_at: string | null;
+  rejected_reason: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SelfDeclarationDetailResponse {
+  data: SelfDeclaration;
+}
+
+export interface ApproveSelfDeclarationResponse {
+  message: string;
+  self_declaration: SelfDeclaration;
+}
+
+export interface RejectSelfDeclarationResponse {
+  message: string;
+  self_declaration: SelfDeclaration;
 }

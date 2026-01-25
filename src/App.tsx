@@ -8,6 +8,8 @@ import { LoginPage } from '@/pages/LoginPage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { ApplicationsListPage } from '@/pages/ApplicationsListPage';
 import { ApplicationDetailPage } from '@/pages/ApplicationDetailPage';
+import { SelfDeclarationsListPage } from '@/pages/SelfDeclarationsListPage';
+import { SelfDeclarationDetailPage } from '@/pages/SelfDeclarationDetailPage';
 import { MembersListPage } from '@/pages/MembersListPage';
 import { MemberDetailPage } from '@/pages/MemberDetailPage';
 import { PaymentsListPage } from '@/pages/PaymentsListPage';
@@ -40,6 +42,8 @@ function App() {
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="applications" element={<ApplicationsListPage />} />
             <Route path="applications/:id" element={<ApplicationDetailPage />} />
+            <Route path="self-declarations" element={<SelfDeclarationsListPage />} />
+            <Route path="self-declarations/:id" element={<SelfDeclarationDetailPage />} />
             <Route path="members" element={<MembersListPage />} />
             <Route path="members/:id" element={<MemberDetailPage />} />
             <Route path="payments" element={<PaymentsListPage />} />

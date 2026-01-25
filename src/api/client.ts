@@ -18,6 +18,11 @@ import type {
   PaymentDetailResponse,
   ApprovePaymentResponse,
   RejectPaymentResponse,
+  SelfDeclaration,
+  SelfDeclarationStatus,
+  SelfDeclarationDetailResponse,
+  ApproveSelfDeclarationResponse,
+  RejectSelfDeclarationResponse,
 } from '@/types/api';
 import { endpoints } from './endpoints';
 
@@ -209,6 +214,45 @@ class ApiClient {
   async rejectPayment(id: number): Promise<RejectPaymentResponse> {
     const response = await this.client.post<RejectPaymentResponse>(
       endpoints.rejectPayment(id)
+    );
+    return response.data;
+  }
+
+  // Self Declaration Management
+  async getSelfDeclarations(
+    status?: SelfDeclarationStatus
+  ): Promise<PaginatedResponse<SelfDeclaration>> {
+    const params = status ? { status } : {};
+    const response = await this.client.get<PaginatedResponse<SelfDeclaration>>(
+      endpoints.selfDeclarations,
+      { params }
+    );
+    return response.data;
+  }
+
+  async getSelfDeclaration(id: number): Promise<SelfDeclarationDetailResponse> {
+    const response = await this.client.get<SelfDeclarationDetailResponse>(
+      endpoints.selfDeclaration(id)
+    );
+    return response.data;
+  }
+
+  async approveSelfDeclaration(
+    id: number
+  ): Promise<ApproveSelfDeclarationResponse> {
+    const response = await this.client.post<ApproveSelfDeclarationResponse>(
+      endpoints.approveSelfDeclaration(id)
+    );
+    return response.data;
+  }
+
+  async rejectSelfDeclaration(
+    id: number,
+    rejectedReason?: string
+  ): Promise<RejectSelfDeclarationResponse> {
+    const response = await this.client.post<RejectSelfDeclarationResponse>(
+      endpoints.rejectSelfDeclaration(id),
+      { rejected_reason: rejectedReason }
     );
     return response.data;
   }

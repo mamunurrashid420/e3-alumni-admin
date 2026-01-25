@@ -7,6 +7,7 @@ import type {
   TShirtSize,
   BloodGroup,
   StudentshipProofType,
+  SelfDeclarationStatus,
 } from '@/types/api';
 
 export const APPLICATION_STATUSES: ApplicationStatus[] = [
@@ -94,4 +95,16 @@ export const PAYMENT_PURPOSE_LABELS: Record<PaymentPurpose, string> = {
   DONATIONS: 'Donations',
   PATRON: 'Patron',
   OTHERS: 'Others',
+};
+
+export const SELF_DECLARATION_STATUSES: SelfDeclarationStatus[] = [
+  'PENDING',
+  'APPROVED',
+  'REJECTED',
+];
+
+export const SELF_DECLARATION_STATUS_LABELS: Record<SelfDeclarationStatus, string> = {
+  PENDING: 'Pending',
+  APPROVED: 'Approved',
+  REJECTED: 'Rejected',
 };

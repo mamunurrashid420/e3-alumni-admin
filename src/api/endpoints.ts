@@ -25,4 +25,12 @@ export const endpoints = {
   payment: (id: number) => `${API_BASE}/payments/${id}`,
   approvePayment: (id: number) => `${API_BASE}/payments/${id}/approve`,
   rejectPayment: (id: number) => `${API_BASE}/payments/${id}/reject`,
+
+  // Self Declarations
+  selfDeclarations: `${API_BASE}/self-declarations`,
+  selfDeclaration: (id: number) => `${API_BASE}/self-declarations/${id}`,
+  approveSelfDeclaration: (id: number) =>
+    `${API_BASE}/self-declarations/${id}/approve`,
+  rejectSelfDeclaration: (id: number) =>
+    `${API_BASE}/self-declarations/${id}/reject`,
 } as const;
