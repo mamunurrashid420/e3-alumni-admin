@@ -19,6 +19,7 @@ export const endpoints = {
   // Members
   members: `${API_BASE}/members`,
   member: (id: number) => `${API_BASE}/members/${id}`,
+  resendSms: (id: number) => `${API_BASE}/members/${id}/resend-sms`,
 
   // Payments
   payments: `${API_BASE}/payments`,

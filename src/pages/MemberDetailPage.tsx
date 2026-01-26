@@ -21,6 +21,7 @@ export function MemberDetailPage() {
   const navigate = useNavigate();
   const [member, setMember] = useState<Member | null>(null);
   const [loading, setLoading] = useState(true);
+  const [resending, setResending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -40,6 +41,25 @@ export function MemberDetailPage() {
       toast.error(errorMessage);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResendSms = async () => {
+    if (!member || !member.id) return;
+
+    if (!confirm(`Are you sure you want to resend credentials via SMS to ${member.name}?`)) {
+      return;
+    }
+
+    try {
+      setResending(true);
+      const response = await apiClient.resendSms(member.id);
+      toast.success(response.message);
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+    } finally {
+      setResending(false);
     }
   };
 
@@ -84,6 +104,15 @@ export function MemberDetailPage() {
             </Link>
           </p>
         </div>
+        {member.phone && (
+          <Button 
+            variant="outline" 
+            onClick={handleResendSms} 
+            disabled={resending}
+          >
+            {resending ? 'Sending...' : 'Resend SMS Credentials'}
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -103,7 +132,11 @@ export function MemberDetailPage() {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-500">Email</p>
-              <p className="text-base">{member.email}</p>
+              <p className="text-base">{member.email || 'N/A'}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-500">Phone</p>
+              <p className="text-base">{member.phone || 'N/A'}</p>
             </div>
             <div>
               <p className="text-sm font-medium text-gray-500">Role</p>

@@ -176,6 +176,13 @@ class ApiClient {
     return response.data;
   }
 
+  async resendSms(id: number): Promise<{ message: string }> {
+    const response = await this.client.post<{ message: string }>(
+      endpoints.resendSms(id)
+    );
+    return response.data;
+  }
+
   // Payment Management
   async getPayments(status?: PaymentStatus): Promise<PaginatedResponse<Payment>> {
     const params = status ? { status } : {};

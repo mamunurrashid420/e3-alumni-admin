@@ -152,7 +152,8 @@ export interface SecondaryMemberType {
 export interface Member {
   id: number;
   name: string;
-  email: string;
+  email: string | null;
+  phone: string | null;
   role: 'member';
   primary_member_type: MembershipType | null;
   secondary_member_type: SecondaryMemberType | null;
