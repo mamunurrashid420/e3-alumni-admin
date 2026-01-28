@@ -84,6 +84,8 @@ export interface MembershipApplication {
   payment_years: number;
   total_paid_amount: number;
   receipt_file: string | null;
+  photo: string | null;
+  signature: string | null;
   status: ApplicationStatus;
   approved_by: number | null;
   approved_at: string | null;

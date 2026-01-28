@@ -217,6 +217,30 @@ export function ApplicationDetailPage() {
               <p className="text-sm font-medium text-gray-500">T-Shirt Size</p>
               <p className="text-base">{application.t_shirt_size || 'N/A'}</p>
             </div>
+            {application.photo && (
+              <div>
+                <p className="text-sm font-medium text-gray-500">Photo</p>
+                <div className="mt-2">
+                  <AuthenticatedImage
+                    src={application.photo}
+                    alt="Photo"
+                    className="max-w-xs h-auto rounded-lg border border-gray-200"
+                  />
+                </div>
+              </div>
+            )}
+            {application.signature && (
+              <div>
+                <p className="text-sm font-medium text-gray-500">Signature</p>
+                <div className="mt-2">
+                  <AuthenticatedImage
+                    src={application.signature}
+                    alt="Signature"
+                    className="max-w-xs h-auto rounded-lg border border-gray-200"
+                  />
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
