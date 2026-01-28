@@ -378,7 +378,9 @@ export function ApplicationDetailPage() {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-500">Entry Fee</p>
-              <p className="text-base">{formatCurrency(application.entry_fee)}</p>
+              <p className="text-base">
+                {formatCurrency(application.entry_fee)}
+              </p>
             </div>
             <div>
               <p className="text-sm font-medium text-gray-500">Yearly Fee</p>
@@ -386,12 +388,36 @@ export function ApplicationDetailPage() {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-500">Payment Years</p>
-              <p className="text-base">{application.payment_years}</p>
+              <p className="text-base">
+                {typeof application.payment_years === 'string' &&
+                application.payment_years.toLowerCase() === 'lifetime'
+                  ? 'Lifetime'
+                  : application.payment_years}
+              </p>
             </div>
-            <div>
+            <div className="pt-2 border-t border-gray-200">
+              <p className="text-sm font-medium text-gray-500">Membership Fee</p>
+              <p className="text-base">
+                {typeof application.payment_years === 'string' &&
+                application.payment_years.toLowerCase() === 'lifetime' ? (
+                  <>
+                    {formatCurrency(application.yearly_fee)} (Lifetime)
+                  </>
+                ) : (
+                  <>
+                    {formatCurrency(application.yearly_fee)} × {application.payment_years} ={' '}
+                    {formatCurrency(application.total_paid_amount)}
+                  </>
+                )}
+              </p>
+            </div>
+            <div className="pt-2 border-t border-gray-200">
               <p className="text-sm font-medium text-gray-500">Total Paid Amount</p>
-              <p className="text-base font-semibold">
+              <p className="text-lg font-semibold">
                 {formatCurrency(application.total_paid_amount)}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                (Entry fee is shown separately and not included in this total)
               </p>
             </div>
             {application.receipt_file && (
