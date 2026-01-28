@@ -174,6 +174,7 @@ export interface Payment {
   payment_purpose: PaymentPurpose;
   payment_amount: number;
   payment_proof_file: string | null;
+  receipt_file: string | null;
   status: PaymentStatus;
   approved_by: number | null;
   approved_at: string | null;

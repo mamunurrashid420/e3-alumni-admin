@@ -97,6 +97,56 @@ export function PaymentDetailPage() {
     }
   };
 
+  const handleDownloadReceipt = async () => {
+    if (!payment?.receipt_file) return;
+
+    try {
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        toast.error('Authentication required');
+        return;
+      }
+
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+      let receiptUrl = payment.receipt_file;
+      
+      // Construct full URL if needed
+      if (receiptUrl.startsWith('/')) {
+        receiptUrl = `${apiBaseUrl}${receiptUrl}`;
+      } else if (!receiptUrl.startsWith('http://') && !receiptUrl.startsWith('https://')) {
+        receiptUrl = `${apiBaseUrl}/${receiptUrl}`;
+      }
+
+      // Fetch PDF with authentication
+      const response = await fetch(receiptUrl, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to download receipt');
+      }
+
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      
+      // Create a temporary link and trigger download
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `money-receipt-${payment.id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Clean up blob URL after a delay
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+    } catch (err) {
+      console.error('Error downloading receipt:', err);
+      toast.error('Failed to download receipt');
+    }
+  };
+
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'APPROVED':
@@ -172,6 +222,14 @@ export function PaymentDetailPage() {
               </Button>
             </div>
           )}
+          {payment.status === 'APPROVED' && payment.receipt_file && (
+            <Button
+              variant="outline"
+              onClick={handleDownloadReceipt}
+            >
+              Download Receipt
+            </Button>
+          )}
         </div>
       </div>
 
@@ -208,6 +266,18 @@ export function PaymentDetailPage() {
                   alt="Payment Proof"
                   className="max-w-full h-auto rounded-lg border border-gray-200 max-h-[400px] object-contain"
                 />
+              </div>
+            )}
+            {payment.receipt_file && payment.status === 'APPROVED' && (
+              <div>
+                <p className="text-sm font-medium text-gray-500 mb-2">Money Receipt</p>
+                <Button
+                  variant="outline"
+                  onClick={handleDownloadReceipt}
+                  className="w-full"
+                >
+                  Download Receipt
+                </Button>
               </div>
             )}
           </CardContent>
@@ -257,6 +327,18 @@ export function PaymentDetailPage() {
                 <div>
                   <p className="text-sm font-medium text-gray-500">Approved By</p>
                   <p className="text-base">User ID: {payment.approved_by}</p>
+                </div>
+              )}
+              {payment.receipt_file && (
+                <div>
+                  <p className="text-sm font-medium text-gray-500 mb-2">Money Receipt</p>
+                  <Button
+                    variant="outline"
+                    onClick={handleDownloadReceipt}
+                    className="w-full"
+                  >
+                    Download Receipt PDF
+                  </Button>
                 </div>
               )}
             </CardContent>
