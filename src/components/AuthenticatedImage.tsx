@@ -40,7 +40,21 @@ export function AuthenticatedImage({ src, alt, className, onError }: Authenticat
           throw new Error('No authentication token');
         }
 
-        const response = await fetch(src, {
+        // Get API base URL from environment or use default
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+        
+        // Construct full URL if src is relative or doesn't include the base URL
+        let imageUrl = src;
+        if (src.startsWith('/')) {
+          // Relative URL - prepend base URL
+          imageUrl = `${apiBaseUrl}${src}`;
+        } else if (!src.startsWith('http://') && !src.startsWith('https://')) {
+          // Relative URL without leading slash
+          imageUrl = `${apiBaseUrl}/${src}`;
+        }
+        // If src already includes http:// or https://, use it as-is
+
+        const response = await fetch(imageUrl, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
