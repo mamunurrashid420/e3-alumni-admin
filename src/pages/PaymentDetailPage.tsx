@@ -107,10 +107,10 @@ export function PaymentDetailPage() {
         return;
       }
 
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+      const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000').replace(/\/$/, '');
       let receiptUrl = payment.receipt_file;
       
-      // Construct full URL if needed
+      // Construct full URL if needed (base has no trailing slash to avoid double slashes)
       if (receiptUrl.startsWith('/')) {
         receiptUrl = `${apiBaseUrl}${receiptUrl}`;
       } else if (!receiptUrl.startsWith('http://') && !receiptUrl.startsWith('https://')) {
