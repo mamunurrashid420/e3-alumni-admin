@@ -14,6 +14,10 @@ import { MembersListPage } from '@/pages/MembersListPage';
 import { MemberDetailPage } from '@/pages/MemberDetailPage';
 import { PaymentsListPage } from '@/pages/PaymentsListPage';
 import { PaymentDetailPage } from '@/pages/PaymentDetailPage';
+import { ConveningCommitteeListPage } from '@/pages/ConveningCommitteeListPage';
+import { AdvisoryBodyListPage } from '@/pages/AdvisoryBodyListPage';
+import { HonorBoardListPage } from '@/pages/HonorBoardListPage';
+import { BatchRepresentativesListPage } from '@/pages/BatchRepresentativesListPage';
 import { useAuthStore } from '@/stores/authStore';
 
 function App() {
@@ -48,6 +52,10 @@ function App() {
             <Route path="members/:id" element={<MemberDetailPage />} />
             <Route path="payments" element={<PaymentsListPage />} />
             <Route path="payments/:id" element={<PaymentDetailPage />} />
+            <Route path="about/convening-committee" element={<ConveningCommitteeListPage />} />
+            <Route path="about/advisory-body" element={<AdvisoryBodyListPage />} />
+            <Route path="about/honor-board" element={<HonorBoardListPage />} />
+            <Route path="about/batch-representatives" element={<BatchRepresentativesListPage />} />
           </Route>
           <Route path="*" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />} />
         </Routes>

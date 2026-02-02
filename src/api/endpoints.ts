@@ -34,4 +34,16 @@ export const endpoints = {
     `${API_BASE}/self-declarations/${id}/approve`,
   rejectSelfDeclaration: (id: number) =>
     `${API_BASE}/self-declarations/${id}/reject`,
+
+  // About Us content
+  conveningCommittee: `${API_BASE}/about/convening-committee`,
+  conveningCommitteeMember: (id: number) =>
+    `${API_BASE}/about/convening-committee/${id}`,
+  advisoryBody: `${API_BASE}/about/advisory-body`,
+  advisoryBodyMember: (id: number) => `${API_BASE}/about/advisory-body/${id}`,
+  honorBoard: `${API_BASE}/about/honor-board`,
+  honorBoardEntry: (id: number) => `${API_BASE}/about/honor-board/${id}`,
+  batchRepresentatives: `${API_BASE}/about/batch-representatives`,
+  batchRepresentative: (id: number) =>
+    `${API_BASE}/about/batch-representatives/${id}`,
 } as const;

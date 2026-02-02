@@ -1,5 +1,15 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, FileText, Users, CreditCard, ClipboardCheck } from 'lucide-react';
+import {
+  LayoutDashboard,
+  FileText,
+  Users,
+  CreditCard,
+  ClipboardCheck,
+  UsersRound,
+  ShieldCheck,
+  Award,
+  UserCircle,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function Sidebar() {
@@ -76,6 +86,67 @@ export function Sidebar() {
           <CreditCard className="w-5 h-5" />
           <span>Payments</span>
         </NavLink>
+        <div className="pt-4 border-t">
+          <p className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            About Us
+          </p>
+          <NavLink
+            to="/about/convening-committee"
+            className={({ isActive }) =>
+              cn(
+                'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
+                isActive
+                  ? 'bg-blue-50 text-blue-700 font-medium'
+                  : 'text-gray-700 hover:bg-gray-50'
+              )
+            }
+          >
+            <UsersRound className="w-5 h-5" />
+            <span>Convening Committee</span>
+          </NavLink>
+          <NavLink
+            to="/about/advisory-body"
+            className={({ isActive }) =>
+              cn(
+                'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
+                isActive
+                  ? 'bg-blue-50 text-blue-700 font-medium'
+                  : 'text-gray-700 hover:bg-gray-50'
+              )
+            }
+          >
+            <ShieldCheck className="w-5 h-5" />
+            <span>Advisory Body</span>
+          </NavLink>
+          <NavLink
+            to="/about/honor-board"
+            className={({ isActive }) =>
+              cn(
+                'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
+                isActive
+                  ? 'bg-blue-50 text-blue-700 font-medium'
+                  : 'text-gray-700 hover:bg-gray-50'
+              )
+            }
+          >
+            <Award className="w-5 h-5" />
+            <span>Honor Board</span>
+          </NavLink>
+          <NavLink
+            to="/about/batch-representatives"
+            className={({ isActive }) =>
+              cn(
+                'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
+                isActive
+                  ? 'bg-blue-50 text-blue-700 font-medium'
+                  : 'text-gray-700 hover:bg-gray-50'
+              )
+            }
+          >
+            <UserCircle className="w-5 h-5" />
+            <span>Batch Representatives</span>
+          </NavLink>
+        </div>
       </nav>
     </aside>
   );

@@ -23,6 +23,12 @@ import type {
   SelfDeclarationDetailResponse,
   ApproveSelfDeclarationResponse,
   RejectSelfDeclarationResponse,
+  ConveningCommitteeMember,
+  AdvisoryBodyMember,
+  HonorBoardEntry,
+  BatchRepresentative,
+  AboutListResponse,
+  HonorBoardRole,
 } from '@/types/api';
 import { endpoints } from './endpoints';
 
@@ -39,12 +45,15 @@ class ApiClient {
       },
     });
 
-    // Request interceptor to add auth token
+    // Request interceptor: add auth token; drop Content-Type for FormData so multipart is used
     this.client.interceptors.request.use(
       (config) => {
         const token = this.getToken();
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
+        }
+        if (config.data instanceof FormData) {
+          delete config.headers['Content-Type'];
         }
         return config;
       },
@@ -262,6 +271,183 @@ class ApiClient {
       { rejected_reason: rejectedReason }
     );
     return response.data;
+  }
+
+  private buildAboutFormData(
+    data: Record<string, string | number | File | null | undefined>,
+    isPut = false
+  ): FormData {
+    const form = new FormData();
+    if (isPut) {
+      form.append('_method', 'PUT');
+    }
+    for (const [key, value] of Object.entries(data)) {
+      if (value === undefined) continue;
+      if (value instanceof File) {
+        form.append(key, value);
+      } else if (value !== null) {
+        form.append(key, String(value));
+      }
+    }
+    return form;
+  }
+
+  // About Us - Convening Committee
+  async getConveningCommittee(): Promise<AboutListResponse<ConveningCommitteeMember>> {
+    const response = await this.client.get<AboutListResponse<ConveningCommitteeMember>>(
+      endpoints.conveningCommittee
+    );
+    return response.data;
+  }
+
+  async createConveningCommitteeMember(
+    data: Omit<ConveningCommitteeMember, 'id' | 'created_at' | 'updated_at'> & {
+      photo?: File | null;
+    }
+  ): Promise<{ data: ConveningCommitteeMember }> {
+    const body = this.buildAboutFormData(data);
+    const response = await this.client.post<{ data: ConveningCommitteeMember }>(
+      endpoints.conveningCommittee,
+      body
+    );
+    return response.data;
+  }
+
+  async updateConveningCommitteeMember(
+    id: number,
+    data: Partial<Omit<ConveningCommitteeMember, 'id' | 'created_at' | 'updated_at'>> & {
+      photo?: File | null;
+    }
+  ): Promise<{ data: ConveningCommitteeMember }> {
+    const body = this.buildAboutFormData(data, true);
+    const response = await this.client.post<{ data: ConveningCommitteeMember }>(
+      endpoints.conveningCommitteeMember(id),
+      body
+    );
+    return response.data;
+  }
+
+  async deleteConveningCommitteeMember(id: number): Promise<void> {
+    await this.client.delete(endpoints.conveningCommitteeMember(id));
+  }
+
+  // About Us - Advisory Body
+  async getAdvisoryBody(): Promise<AboutListResponse<AdvisoryBodyMember>> {
+    const response = await this.client.get<AboutListResponse<AdvisoryBodyMember>>(
+      endpoints.advisoryBody
+    );
+    return response.data;
+  }
+
+  async createAdvisoryBodyMember(
+    data: Omit<AdvisoryBodyMember, 'id' | 'created_at' | 'updated_at'> & {
+      photo?: File | null;
+    }
+  ): Promise<{ data: AdvisoryBodyMember }> {
+    const body = this.buildAboutFormData(data);
+    const response = await this.client.post<{ data: AdvisoryBodyMember }>(
+      endpoints.advisoryBody,
+      body
+    );
+    return response.data;
+  }
+
+  async updateAdvisoryBodyMember(
+    id: number,
+    data: Partial<Omit<AdvisoryBodyMember, 'id' | 'created_at' | 'updated_at'>> & {
+      photo?: File | null;
+    }
+  ): Promise<{ data: AdvisoryBodyMember }> {
+    const body = this.buildAboutFormData(data, true);
+    const response = await this.client.post<{ data: AdvisoryBodyMember }>(
+      endpoints.advisoryBodyMember(id),
+      body
+    );
+    return response.data;
+  }
+
+  async deleteAdvisoryBodyMember(id: number): Promise<void> {
+    await this.client.delete(endpoints.advisoryBodyMember(id));
+  }
+
+  // About Us - Honor Board
+  async getHonorBoard(role?: HonorBoardRole): Promise<AboutListResponse<HonorBoardEntry>> {
+    const params = role ? { role } : {};
+    const response = await this.client.get<AboutListResponse<HonorBoardEntry>>(
+      endpoints.honorBoard,
+      { params }
+    );
+    return response.data;
+  }
+
+  async createHonorBoardEntry(
+    data: Omit<HonorBoardEntry, 'id' | 'created_at' | 'updated_at'> & {
+      photo?: File | null;
+    }
+  ): Promise<{ data: HonorBoardEntry }> {
+    const body = this.buildAboutFormData(data);
+    const response = await this.client.post<{ data: HonorBoardEntry }>(
+      endpoints.honorBoard,
+      body
+    );
+    return response.data;
+  }
+
+  async updateHonorBoardEntry(
+    id: number,
+    data: Partial<Omit<HonorBoardEntry, 'id' | 'created_at' | 'updated_at'>> & {
+      photo?: File | null;
+    }
+  ): Promise<{ data: HonorBoardEntry }> {
+    const body = this.buildAboutFormData(data, true);
+    const response = await this.client.post<{ data: HonorBoardEntry }>(
+      endpoints.honorBoardEntry(id),
+      body
+    );
+    return response.data;
+  }
+
+  async deleteHonorBoardEntry(id: number): Promise<void> {
+    await this.client.delete(endpoints.honorBoardEntry(id));
+  }
+
+  // About Us - Batch Representatives
+  async getBatchRepresentatives(): Promise<AboutListResponse<BatchRepresentative>> {
+    const response = await this.client.get<AboutListResponse<BatchRepresentative>>(
+      endpoints.batchRepresentatives
+    );
+    return response.data;
+  }
+
+  async createBatchRepresentative(
+    data: Omit<BatchRepresentative, 'id' | 'created_at' | 'updated_at'> & {
+      photo?: File | null;
+    }
+  ): Promise<{ data: BatchRepresentative }> {
+    const body = this.buildAboutFormData(data);
+    const response = await this.client.post<{ data: BatchRepresentative }>(
+      endpoints.batchRepresentatives,
+      body
+    );
+    return response.data;
+  }
+
+  async updateBatchRepresentative(
+    id: number,
+    data: Partial<Omit<BatchRepresentative, 'id' | 'created_at' | 'updated_at'>> & {
+      photo?: File | null;
+    }
+  ): Promise<{ data: BatchRepresentative }> {
+    const body = this.buildAboutFormData(data, true);
+    const response = await this.client.post<{ data: BatchRepresentative }>(
+      endpoints.batchRepresentative(id),
+      body
+    );
+    return response.data;
+  }
+
+  async deleteBatchRepresentative(id: number): Promise<void> {
+    await this.client.delete(endpoints.batchRepresentative(id));
   }
 }
 

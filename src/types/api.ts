@@ -239,3 +239,57 @@ export interface RejectSelfDeclarationResponse {
   message: string;
   self_declaration: SelfDeclaration;
 }
+
+// About Us content types
+export type HonorBoardRole = 'President' | 'GeneralSecretary';
+
+export interface ConveningCommitteeMember {
+  id: number;
+  name: string;
+  mobile_number: string | null;
+  designation: string | null;
+  occupation: string | null;
+  photo: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AdvisoryBodyMember {
+  id: number;
+  name: string;
+  mobile_number: string | null;
+  designation: string | null;
+  occupation: string | null;
+  photo: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface HonorBoardEntry {
+  id: number;
+  role: HonorBoardRole;
+  name: string;
+  member_id: string | null;
+  durations: string | null;
+  photo: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BatchRepresentative {
+  id: number;
+  name: string;
+  mobile_number: string | null;
+  ssc_batch: string | null;
+  photo: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AboutListResponse<T> {
+  data: T[];
+}
