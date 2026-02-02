@@ -29,6 +29,7 @@ import type {
   BatchRepresentative,
   AboutListResponse,
   HonorBoardRole,
+  Download,
 } from '@/types/api';
 import { endpoints } from './endpoints';
 
@@ -484,6 +485,62 @@ class ApiClient {
 
   async deleteBatchRepresentative(id: number): Promise<void> {
     await this.client.delete(endpoints.batchRepresentative(id));
+  }
+
+  // Downloads
+  async getDownloads(): Promise<AboutListResponse<Download>> {
+    const response = await this.client.get<AboutListResponse<Download>>(
+      endpoints.downloads
+    );
+    return response.data;
+  }
+
+  async createDownload(data: {
+    title: string;
+    description?: string | null;
+    file: File;
+    sort_order?: number;
+  }): Promise<{ data: Download }> {
+    const body = this.buildAboutFormData({
+      title: data.title,
+      description: data.description ?? null,
+      file: data.file,
+      sort_order: data.sort_order ?? 0,
+    });
+    const response = await this.client.post<{ data: Download }>(
+      endpoints.downloads,
+      body
+    );
+    return response.data;
+  }
+
+  async updateDownload(
+    id: number,
+    data: {
+      title?: string;
+      description?: string | null;
+      file?: File | null;
+      sort_order?: number;
+    }
+  ): Promise<{ data: Download }> {
+    const body = this.buildAboutFormData(
+      {
+        title: data.title,
+        description: data.description,
+        file: data.file ?? undefined,
+        sort_order: data.sort_order,
+      },
+      true
+    );
+    const response = await this.client.post<{ data: Download }>(
+      endpoints.download(id),
+      body
+    );
+    return response.data;
+  }
+
+  async deleteDownload(id: number): Promise<void> {
+    await this.client.delete(endpoints.download(id));
   }
 }
 

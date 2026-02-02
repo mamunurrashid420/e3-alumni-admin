@@ -316,3 +316,12 @@ export interface BatchRepresentative {
 export interface AboutListResponse<T> {
   data: T[];
 }
+
+export interface Download {
+  id: number;
+  title: string;
+  description: string | null;
+  file_url: string | null;
+  sort_order: number;
+  created_at: string;
+}

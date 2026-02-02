@@ -18,6 +18,7 @@ import { ConveningCommitteeListPage } from '@/pages/ConveningCommitteeListPage';
 import { AdvisoryBodyListPage } from '@/pages/AdvisoryBodyListPage';
 import { HonorBoardListPage } from '@/pages/HonorBoardListPage';
 import { BatchRepresentativesListPage } from '@/pages/BatchRepresentativesListPage';
+import { DownloadsListPage } from '@/pages/DownloadsListPage';
 import { useAuthStore } from '@/stores/authStore';
 
 function App() {
@@ -52,6 +53,7 @@ function App() {
             <Route path="members/:id" element={<MemberDetailPage />} />
             <Route path="payments" element={<PaymentsListPage />} />
             <Route path="payments/:id" element={<PaymentDetailPage />} />
+            <Route path="downloads" element={<DownloadsListPage />} />
             <Route path="about/convening-committee" element={<ConveningCommitteeListPage />} />
             <Route path="about/advisory-body" element={<AdvisoryBodyListPage />} />
             <Route path="about/honor-board" element={<HonorBoardListPage />} />

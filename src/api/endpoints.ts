@@ -48,4 +48,8 @@ export const endpoints = {
   batchRepresentatives: `${API_BASE}/about/batch-representatives`,
   batchRepresentative: (id: number) =>
     `${API_BASE}/about/batch-representatives/${id}`,
+
+  // Downloads
+  downloads: `${API_BASE}/downloads`,
+  download: (id: number) => `${API_BASE}/downloads/${id}`,
 } as const;
