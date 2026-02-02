@@ -185,6 +185,16 @@ class ApiClient {
     return response.data;
   }
 
+  async updateMember(
+    id: number,
+    data: { name: string; email?: string | null; phone: string }
+  ): Promise<Member & { phone_changed?: boolean }> {
+    const response = await this.client.put<
+      Member & { phone_changed?: boolean }
+    >(endpoints.updateMember(id), data);
+    return response.data;
+  }
+
   async resendSms(id: number): Promise<{ message: string }> {
     const response = await this.client.post<{ message: string }>(
       endpoints.resendSms(id)

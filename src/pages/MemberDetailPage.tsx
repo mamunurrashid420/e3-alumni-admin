@@ -11,6 +11,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { MEMBERSHIP_TYPE_LABELS } from '@/lib/constants';
 import { formatDate } from '@/lib/format';
 import { handleApiError } from '@/lib/errorHandler';
@@ -22,7 +24,11 @@ export function MemberDetailPage() {
   const [member, setMember] = useState<Member | null>(null);
   const [loading, setLoading] = useState(true);
   const [resending, setResending] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [showPhoneChangedPrompt, setShowPhoneChangedPrompt] = useState(false);
+  const [editForm, setEditForm] = useState({ name: '', email: '', phone: '' });
 
   useEffect(() => {
     loadMember();
@@ -44,6 +50,49 @@ export function MemberDetailPage() {
     }
   };
 
+  const handleEdit = () => {
+    if (!member) return;
+    setEditForm({
+      name: member.name,
+      email: member.email ?? '',
+      phone: member.phone ?? '',
+    });
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+  };
+
+  const handleSaveMember = async () => {
+    if (!member || !member.id) return;
+    const phone = editForm.phone.trim();
+    if (!phone) {
+      toast.error('Phone number is required');
+      return;
+    }
+    try {
+      setSaving(true);
+      const response = await apiClient.updateMember(member.id, {
+        name: editForm.name.trim(),
+        email: editForm.email.trim() || null,
+        phone,
+      });
+      const { phone_changed: _pc, ...updatedMember } = response;
+      setMember({ ...member, ...updatedMember });
+      setIsEditing(false);
+      toast.success('Member updated successfully');
+      if (response.phone_changed) {
+        setShowPhoneChangedPrompt(true);
+      }
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleResendSms = async () => {
     if (!member || !member.id) return;
 
@@ -55,6 +104,7 @@ export function MemberDetailPage() {
       setResending(true);
       const response = await apiClient.resendSms(member.id);
       toast.success(response.message);
+      setShowPhoneChangedPrompt(false);
     } catch (err) {
       const errorMessage = handleApiError(err);
       toast.error(errorMessage);
@@ -104,16 +154,41 @@ export function MemberDetailPage() {
             </Link>
           </p>
         </div>
-        {member.phone && (
-          <Button 
-            variant="outline" 
-            onClick={handleResendSms} 
-            disabled={resending}
-          >
-            {resending ? 'Sending...' : 'Resend SMS Credentials'}
-          </Button>
-        )}
+        <div className="flex gap-2">
+          {!isEditing ? (
+            <Button variant="outline" onClick={handleEdit}>
+              Edit
+            </Button>
+          ) : null}
+          {member.phone && !isEditing && (
+            <Button
+              variant="outline"
+              onClick={handleResendSms}
+              disabled={resending}
+            >
+              {resending ? 'Sending...' : 'Resend SMS Credentials'}
+            </Button>
+          )}
+        </div>
       </div>
+
+      {showPhoneChangedPrompt && (
+        <Card className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30">
+          <CardContent className="pt-6">
+            <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-2">
+              Phone number was updated. Resend SMS credentials to the new number?
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleResendSms}
+              disabled={resending}
+            >
+              {resending ? 'Sending...' : 'Resend SMS'}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Basic Information */}
@@ -122,36 +197,89 @@ export function MemberDetailPage() {
             <CardTitle>Basic Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <p className="text-sm font-medium text-gray-500">User ID</p>
-              <p className="text-base">{member.id}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Name</p>
-              <p className="text-base">{member.name}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Email</p>
-              <p className="text-base">{member.email || 'N/A'}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Phone</p>
-              <p className="text-base">{member.phone || 'N/A'}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Role</p>
-              <p className="text-base">{member.role}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Member ID</p>
-              {member.member_id ? (
-                <Badge variant="outline" className="text-base">
-                  {member.member_id}
-                </Badge>
-              ) : (
-                <p className="text-base text-gray-400">N/A</p>
-              )}
-            </div>
+            {isEditing ? (
+              <>
+                <div>
+                  <Label htmlFor="edit-name">Name</Label>
+                  <Input
+                    id="edit-name"
+                    value={editForm.name}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({ ...prev, name: e.target.value }))
+                    }
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit-email">Email</Label>
+                  <Input
+                    id="edit-email"
+                    type="email"
+                    value={editForm.email}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({ ...prev, email: e.target.value }))
+                    }
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit-phone">Phone (required)</Label>
+                  <Input
+                    id="edit-phone"
+                    type="tel"
+                    value={editForm.phone}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({ ...prev, phone: e.target.value }))
+                    }
+                    className="mt-1"
+                  />
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    onClick={handleSaveMember}
+                    disabled={saving}
+                  >
+                    {saving ? 'Saving...' : 'Save'}
+                  </Button>
+                  <Button variant="outline" onClick={handleCancelEdit}>
+                    Cancel
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">User ID</p>
+                  <p className="text-base">{member.id}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Name</p>
+                  <p className="text-base">{member.name}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Email</p>
+                  <p className="text-base">{member.email || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Phone</p>
+                  <p className="text-base">{member.phone || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Role</p>
+                  <p className="text-base">{member.role}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Member ID</p>
+                  {member.member_id ? (
+                    <Badge variant="outline" className="text-base">
+                      {member.member_id}
+                    </Badge>
+                  ) : (
+                    <p className="text-base text-gray-400">N/A</p>
+                  )}
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 
