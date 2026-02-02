@@ -30,6 +30,10 @@ import type {
   AboutListResponse,
   HonorBoardRole,
   Download,
+  EventListResponse,
+  EventDetailResponse,
+  EventRegistrationsResponse,
+  EventStatus,
 } from '@/types/api';
 import { endpoints } from './endpoints';
 
@@ -541,6 +545,89 @@ class ApiClient {
 
   async deleteDownload(id: number): Promise<void> {
     await this.client.delete(endpoints.download(id));
+  }
+
+  // Events
+  async getEvents(params?: { status?: EventStatus }): Promise<EventListResponse> {
+    const response = await this.client.get<EventListResponse>(
+      endpoints.events,
+      { params }
+    );
+    return response.data;
+  }
+
+  async getEvent(id: number): Promise<EventDetailResponse> {
+    const response = await this.client.get<EventDetailResponse>(
+      endpoints.event(id)
+    );
+    return response.data;
+  }
+
+  async createEvent(data: {
+    title: string;
+    description?: string | null;
+    location?: string | null;
+    start_at: string;
+    end_at: string;
+    status: EventStatus;
+    cover_photo?: File | null;
+  }): Promise<EventDetailResponse> {
+    const form = new FormData();
+    form.append('title', data.title);
+    if (data.description != null) form.append('description', data.description);
+    if (data.location != null) form.append('location', data.location);
+    form.append('start_at', data.start_at);
+    form.append('end_at', data.end_at);
+    form.append('status', data.status);
+    if (data.cover_photo) form.append('cover_photo', data.cover_photo);
+    const response = await this.client.post<EventDetailResponse>(
+      endpoints.events,
+      form
+    );
+    return response.data;
+  }
+
+  async updateEvent(
+    id: number,
+    data: {
+      title?: string;
+      description?: string | null;
+      location?: string | null;
+      start_at?: string;
+      end_at?: string;
+      status?: EventStatus;
+      cover_photo?: File | null;
+      photos?: File[];
+    }
+  ): Promise<EventDetailResponse> {
+    const form = new FormData();
+    form.append('_method', 'PUT');
+    if (data.title != null) form.append('title', data.title);
+    if (data.description != null) form.append('description', data.description);
+    if (data.location != null) form.append('location', data.location);
+    if (data.start_at != null) form.append('start_at', data.start_at);
+    if (data.end_at != null) form.append('end_at', data.end_at);
+    if (data.status != null) form.append('status', data.status);
+    if (data.cover_photo) form.append('cover_photo', data.cover_photo);
+    if (data.photos?.length) {
+      data.photos.forEach((file) => form.append('photos[]', file));
+    }
+    const response = await this.client.post<EventDetailResponse>(
+      endpoints.event(id),
+      form
+    );
+    return response.data;
+  }
+
+  async deleteEvent(id: number): Promise<void> {
+    await this.client.delete(endpoints.event(id));
+  }
+
+  async getEventRegistrations(id: number): Promise<EventRegistrationsResponse> {
+    const response = await this.client.get<EventRegistrationsResponse>(
+      endpoints.eventRegistrations(id)
+    );
+    return response.data;
   }
 }
 

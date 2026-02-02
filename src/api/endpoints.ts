@@ -52,4 +52,9 @@ export const endpoints = {
   // Downloads
   downloads: `${API_BASE}/downloads`,
   download: (id: number) => `${API_BASE}/downloads/${id}`,
+
+  // Events
+  events: `${API_BASE}/events`,
+  event: (id: number) => `${API_BASE}/events/${id}`,
+  eventRegistrations: (id: number) => `${API_BASE}/events/${id}/registrations`,
 } as const;

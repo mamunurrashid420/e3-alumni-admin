@@ -317,6 +317,62 @@ export interface AboutListResponse<T> {
   data: T[];
 }
 
+export type EventStatus = 'draft' | 'open' | 'closed';
+
+export interface EventPhoto {
+  id: number;
+  url: string;
+  sort_order: number;
+}
+
+export interface Event {
+  id: number;
+  title: string;
+  description: string | null;
+  location: string | null;
+  start_at: string;
+  end_at: string;
+  status: EventStatus;
+  cover_photo: string | null;
+  photos?: EventPhoto[];
+  registration_count?: number;
+  is_registered?: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EventListResponse {
+  data: Event[];
+}
+
+export interface EventDetailResponse {
+  data: Event;
+}
+
+export interface EventRegistration {
+  id: number;
+  event_id: number;
+  user_id: number | null;
+  name: string | null;
+  phone: string | null;
+  address: string | null;
+  ssc_jsc: string | null;
+  registered_at: string;
+  notes: string | null;
+  guest_count: number;
+  user: {
+    id: number;
+    name: string;
+    email: string | null;
+    phone: string | null;
+    member_id: string | null;
+  } | null;
+}
+
+export interface EventRegistrationsResponse {
+  data: EventRegistration[];
+}
+
 export interface Download {
   id: number;
   title: string;
