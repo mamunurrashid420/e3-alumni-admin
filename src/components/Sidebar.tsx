@@ -11,6 +11,8 @@ import {
   UserCircle,
   Download,
   Calendar,
+  GraduationCap,
+  BookOpen,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -87,6 +89,34 @@ export function Sidebar() {
         >
           <CreditCard className="w-5 h-5" />
           <span>Payments</span>
+        </NavLink>
+        <NavLink
+          to="/scholarships"
+          className={({ isActive }) =>
+            cn(
+              'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
+              isActive
+                ? 'bg-blue-50 text-blue-700 font-medium'
+                : 'text-gray-700 hover:bg-gray-50'
+            )
+          }
+        >
+          <GraduationCap className="w-5 h-5" />
+          <span>Scholarships</span>
+        </NavLink>
+        <NavLink
+          to="/scholarship-applications"
+          className={({ isActive }) =>
+            cn(
+              'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
+              isActive
+                ? 'bg-blue-50 text-blue-700 font-medium'
+                : 'text-gray-700 hover:bg-gray-50'
+            )
+          }
+        >
+          <BookOpen className="w-5 h-5" />
+          <span>Scholarship Applications</span>
         </NavLink>
         <NavLink
           to="/downloads"

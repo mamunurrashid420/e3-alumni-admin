@@ -263,6 +263,65 @@ export interface RejectSelfDeclarationResponse {
   self_declaration: SelfDeclaration;
 }
 
+// Scholarship types
+export type ScholarshipApplicationStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+export interface Scholarship {
+  id: number;
+  title: string;
+  description: string | null;
+  category: string | null;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ScholarshipApplication {
+  id: number;
+  scholarship_id: number;
+  scholarship?: Scholarship;
+  applicant_name: string;
+  applicant_email: string | null;
+  applicant_phone: string;
+  applicant_address: string | null;
+  class_or_grade: string | null;
+  school_name: string | null;
+  parent_or_guardian_name: string | null;
+  academic_proof_file: string | null;
+  other_document_file: string | null;
+  statement: string | null;
+  user_id: number | null;
+  status: ScholarshipApplicationStatus;
+  approved_by: number | null;
+  approved_at: string | null;
+  rejected_reason: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ScholarshipListResponse {
+  data: Scholarship[];
+}
+
+export interface ScholarshipDetailResponse {
+  data: Scholarship;
+}
+
+export interface ScholarshipApplicationDetailResponse {
+  data: ScholarshipApplication;
+}
+
+export interface ApproveScholarshipApplicationResponse {
+  message: string;
+  data: ScholarshipApplication;
+}
+
+export interface RejectScholarshipApplicationResponse {
+  message: string;
+  data: ScholarshipApplication;
+}
+
 // About Us content types
 export type HonorBoardRole = 'President' | 'GeneralSecretary';
 

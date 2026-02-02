@@ -57,4 +57,15 @@ export const endpoints = {
   events: `${API_BASE}/events`,
   event: (id: number) => `${API_BASE}/events/${id}`,
   eventRegistrations: (id: number) => `${API_BASE}/events/${id}/registrations`,
+
+  // Scholarships
+  scholarships: `${API_BASE}/scholarships`,
+  scholarship: (id: number) => `${API_BASE}/scholarships/${id}`,
+  scholarshipApplications: `${API_BASE}/scholarship-applications`,
+  scholarshipApplication: (id: number) =>
+    `${API_BASE}/scholarship-applications/${id}`,
+  approveScholarshipApplication: (id: number) =>
+    `${API_BASE}/scholarship-applications/${id}/approve`,
+  rejectScholarshipApplication: (id: number) =>
+    `${API_BASE}/scholarship-applications/${id}/reject`,
 } as const;

@@ -23,6 +23,9 @@ import { EventsListPage } from '@/pages/EventsListPage';
 import { EventDetailPage } from '@/pages/EventDetailPage';
 import { CreateEventPage } from '@/pages/CreateEventPage';
 import { EditEventPage } from '@/pages/EditEventPage';
+import { ScholarshipsListPage } from '@/pages/ScholarshipsListPage';
+import { ScholarshipApplicationsListPage } from '@/pages/ScholarshipApplicationsListPage';
+import { ScholarshipApplicationDetailPage } from '@/pages/ScholarshipApplicationDetailPage';
 import { useAuthStore } from '@/stores/authStore';
 
 function App() {
@@ -57,6 +60,9 @@ function App() {
             <Route path="members/:id" element={<MemberDetailPage />} />
             <Route path="payments" element={<PaymentsListPage />} />
             <Route path="payments/:id" element={<PaymentDetailPage />} />
+            <Route path="scholarships" element={<ScholarshipsListPage />} />
+            <Route path="scholarship-applications" element={<ScholarshipApplicationsListPage />} />
+            <Route path="scholarship-applications/:id" element={<ScholarshipApplicationDetailPage />} />
             <Route path="downloads" element={<DownloadsListPage />} />
             <Route path="events" element={<EventsListPage />} />
             <Route path="events/new" element={<CreateEventPage />} />

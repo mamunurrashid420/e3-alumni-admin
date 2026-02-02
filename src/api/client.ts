@@ -34,6 +34,13 @@ import type {
   EventDetailResponse,
   EventRegistrationsResponse,
   EventStatus,
+  ScholarshipApplication,
+  ScholarshipApplicationStatus,
+  ScholarshipListResponse,
+  ScholarshipDetailResponse,
+  ScholarshipApplicationDetailResponse,
+  ApproveScholarshipApplicationResponse,
+  RejectScholarshipApplicationResponse,
 } from '@/types/api';
 import { endpoints } from './endpoints';
 
@@ -309,6 +316,101 @@ class ApiClient {
   ): Promise<RejectSelfDeclarationResponse> {
     const response = await this.client.post<RejectSelfDeclarationResponse>(
       endpoints.rejectSelfDeclaration(id),
+      { rejected_reason: rejectedReason }
+    );
+    return response.data;
+  }
+
+  // Scholarships
+  async getScholarships(isActive?: boolean): Promise<ScholarshipListResponse> {
+    const params = isActive !== undefined ? { is_active: isActive } : {};
+    const response = await this.client.get<ScholarshipListResponse>(
+      endpoints.scholarships,
+      { params }
+    );
+    return response.data;
+  }
+
+  async getScholarship(id: number): Promise<ScholarshipDetailResponse> {
+    const response = await this.client.get<ScholarshipDetailResponse>(
+      endpoints.scholarship(id)
+    );
+    return response.data;
+  }
+
+  async createScholarship(data: {
+    title: string;
+    description?: string | null;
+    category?: string | null;
+    is_active?: boolean;
+    sort_order?: number;
+  }): Promise<ScholarshipDetailResponse> {
+    const response = await this.client.post<ScholarshipDetailResponse>(
+      endpoints.scholarships,
+      data
+    );
+    return response.data;
+  }
+
+  async updateScholarship(
+    id: number,
+    data: Partial<{
+      title: string;
+      description: string | null;
+      category: string | null;
+      is_active: boolean;
+      sort_order: number;
+    }>
+  ): Promise<ScholarshipDetailResponse> {
+    const response = await this.client.put<ScholarshipDetailResponse>(
+      endpoints.scholarship(id),
+      data
+    );
+    return response.data;
+  }
+
+  async deleteScholarship(id: number): Promise<void> {
+    await this.client.delete(endpoints.scholarship(id));
+  }
+
+  // Scholarship Applications
+  async getScholarshipApplications(
+    status?: ScholarshipApplicationStatus,
+    scholarshipId?: number
+  ): Promise<PaginatedResponse<ScholarshipApplication>> {
+    const params: Record<string, string | number> = {};
+    if (status) params.status = status;
+    if (scholarshipId) params.scholarship_id = scholarshipId;
+    const response = await this.client.get<
+      PaginatedResponse<ScholarshipApplication>
+    >(endpoints.scholarshipApplications, { params });
+    return response.data;
+  }
+
+  async getScholarshipApplication(
+    id: number
+  ): Promise<ScholarshipApplicationDetailResponse> {
+    const response = await this.client.get<ScholarshipApplicationDetailResponse>(
+      endpoints.scholarshipApplication(id)
+    );
+    return response.data;
+  }
+
+  async approveScholarshipApplication(
+    id: number
+  ): Promise<ApproveScholarshipApplicationResponse> {
+    const response = await this.client.post<ApproveScholarshipApplicationResponse>(
+      endpoints.approveScholarshipApplication(id)
+    );
+    return response.data;
+  }
+
+  async rejectScholarshipApplication(
+    id: number,
+    rejectedReason?: string
+  ): Promise<RejectScholarshipApplicationResponse> {
+    const response = await this.client.post<RejectScholarshipApplicationResponse>(
+      endpoints.rejectScholarshipApplication(id),
       { rejected_reason: rejectedReason }
     );
     return response.data;
