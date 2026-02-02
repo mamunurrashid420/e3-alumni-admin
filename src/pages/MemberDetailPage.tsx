@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { apiClient } from '@/api/client';
-import type { Member } from '@/types/api';
+import type { Member, MemberProfile } from '@/types/api';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -13,10 +13,54 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { MEMBERSHIP_TYPE_LABELS } from '@/lib/constants';
 import { formatDate } from '@/lib/format';
 import { handleApiError } from '@/lib/errorHandler';
 import { toast } from 'sonner';
+
+const emptyProfileForm = {
+  name_bangla: '',
+  father_name: '',
+  mother_name: '',
+  gender: '',
+  jsc_year: '',
+  ssc_year: '',
+  highest_educational_degree: '',
+  present_address: '',
+  permanent_address: '',
+  profession: '',
+  designation: '',
+  institute_name: '',
+  t_shirt_size: '',
+  blood_group: '',
+};
+
+function profileToForm(p: MemberProfile | null): typeof emptyProfileForm {
+  if (!p) return emptyProfileForm;
+  return {
+    name_bangla: p.name_bangla ?? '',
+    father_name: p.father_name ?? '',
+    mother_name: p.mother_name ?? '',
+    gender: p.gender ?? '',
+    jsc_year: p.jsc_year != null ? String(p.jsc_year) : '',
+    ssc_year: p.ssc_year != null ? String(p.ssc_year) : '',
+    highest_educational_degree: p.highest_educational_degree ?? '',
+    present_address: p.present_address ?? '',
+    permanent_address: p.permanent_address ?? '',
+    profession: p.profession ?? '',
+    designation: p.designation ?? '',
+    institute_name: p.institute_name ?? '',
+    t_shirt_size: p.t_shirt_size ?? '',
+    blood_group: p.blood_group ?? '',
+  };
+}
 
 export function MemberDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -29,6 +73,9 @@ export function MemberDetailPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [showPhoneChangedPrompt, setShowPhoneChangedPrompt] = useState(false);
   const [editForm, setEditForm] = useState({ name: '', email: '', phone: '' });
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState(emptyProfileForm);
 
   useEffect(() => {
     loadMember();
@@ -110,6 +157,48 @@ export function MemberDetailPage() {
       toast.error(errorMessage);
     } finally {
       setResending(false);
+    }
+  };
+
+  const handleEditProfile = () => {
+    if (!member?.profile) return;
+    setProfileForm(profileToForm(member.profile));
+    setIsEditingProfile(true);
+  };
+
+  const handleCancelEditProfile = () => {
+    setIsEditingProfile(false);
+  };
+
+  const handleSaveProfile = async () => {
+    if (!member?.id || !member.profile) return;
+    try {
+      setSavingProfile(true);
+      const payload = {
+        name_bangla: profileForm.name_bangla.trim() || null,
+        father_name: profileForm.father_name.trim() || null,
+        mother_name: profileForm.mother_name.trim() || null,
+        gender: profileForm.gender.trim() || null,
+        jsc_year: profileForm.jsc_year.trim() ? parseInt(profileForm.jsc_year, 10) : null,
+        ssc_year: profileForm.ssc_year.trim() ? parseInt(profileForm.ssc_year, 10) : null,
+        highest_educational_degree: profileForm.highest_educational_degree.trim() || null,
+        present_address: profileForm.present_address.trim() || null,
+        permanent_address: profileForm.permanent_address.trim() || null,
+        profession: profileForm.profession.trim() || null,
+        designation: profileForm.designation.trim() || null,
+        institute_name: profileForm.institute_name.trim() || null,
+        t_shirt_size: profileForm.t_shirt_size.trim() || null,
+        blood_group: profileForm.blood_group.trim() || null,
+      };
+      const response = await apiClient.updateMemberProfile(member.id, payload);
+      setMember(response.data);
+      setIsEditingProfile(false);
+      toast.success('Member profile updated successfully');
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+    } finally {
+      setSavingProfile(false);
     }
   };
 
@@ -320,6 +409,292 @@ export function MemberDetailPage() {
                 <p className="text-base text-gray-400">N/A</p>
               )}
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Member Profile (from member_profiles) */}
+        <Card className="md:col-span-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <div>
+              <CardTitle>Member Profile</CardTitle>
+              <CardDescription>
+                Detailed profile (address, profession, education, etc.)
+              </CardDescription>
+            </div>
+            {member.profile && !isEditingProfile && (
+              <Button variant="outline" size="sm" onClick={handleEditProfile}>
+                Edit Profile
+              </Button>
+            )}
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {member.profile ? (
+              isEditingProfile ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="profile-name_bangla">Name (Bangla)</Label>
+                    <Input
+                      id="profile-name_bangla"
+                      value={profileForm.name_bangla}
+                      onChange={(e) =>
+                        setProfileForm((p) => ({ ...p, name_bangla: e.target.value }))
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="profile-father_name">Father&apos;s Name</Label>
+                    <Input
+                      id="profile-father_name"
+                      value={profileForm.father_name}
+                      onChange={(e) =>
+                        setProfileForm((p) => ({ ...p, father_name: e.target.value }))
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="profile-mother_name">Mother&apos;s Name</Label>
+                    <Input
+                      id="profile-mother_name"
+                      value={profileForm.mother_name}
+                      onChange={(e) =>
+                        setProfileForm((p) => ({ ...p, mother_name: e.target.value }))
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="profile-gender">Gender</Label>
+                    <Select
+                      value={profileForm.gender || undefined}
+                      onValueChange={(v) =>
+                        setProfileForm((p) => ({ ...p, gender: v }))
+                      }
+                    >
+                      <SelectTrigger id="profile-gender" className="mt-1">
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="MALE">Male</SelectItem>
+                        <SelectItem value="FEMALE">Female</SelectItem>
+                        <SelectItem value="OTHER">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="profile-jsc_year">JSC Year</Label>
+                    <Input
+                      id="profile-jsc_year"
+                      type="number"
+                      value={profileForm.jsc_year}
+                      onChange={(e) =>
+                        setProfileForm((p) => ({ ...p, jsc_year: e.target.value }))
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="profile-ssc_year">SSC Year</Label>
+                    <Input
+                      id="profile-ssc_year"
+                      type="number"
+                      value={profileForm.ssc_year}
+                      onChange={(e) =>
+                        setProfileForm((p) => ({ ...p, ssc_year: e.target.value }))
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <Label htmlFor="profile-highest_educational_degree">Highest Degree</Label>
+                    <Input
+                      id="profile-highest_educational_degree"
+                      value={profileForm.highest_educational_degree}
+                      onChange={(e) =>
+                        setProfileForm((p) => ({
+                          ...p,
+                          highest_educational_degree: e.target.value,
+                        }))
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <Label htmlFor="profile-present_address">Present Address</Label>
+                    <Input
+                      id="profile-present_address"
+                      value={profileForm.present_address}
+                      onChange={(e) =>
+                        setProfileForm((p) => ({ ...p, present_address: e.target.value }))
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <Label htmlFor="profile-permanent_address">Permanent Address</Label>
+                    <Input
+                      id="profile-permanent_address"
+                      value={profileForm.permanent_address}
+                      onChange={(e) =>
+                        setProfileForm((p) => ({ ...p, permanent_address: e.target.value }))
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="profile-profession">Profession</Label>
+                    <Input
+                      id="profile-profession"
+                      value={profileForm.profession}
+                      onChange={(e) =>
+                        setProfileForm((p) => ({ ...p, profession: e.target.value }))
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="profile-designation">Designation</Label>
+                    <Input
+                      id="profile-designation"
+                      value={profileForm.designation}
+                      onChange={(e) =>
+                        setProfileForm((p) => ({ ...p, designation: e.target.value }))
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="profile-institute_name">Institute</Label>
+                    <Input
+                      id="profile-institute_name"
+                      value={profileForm.institute_name}
+                      onChange={(e) =>
+                        setProfileForm((p) => ({ ...p, institute_name: e.target.value }))
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="profile-t_shirt_size">T-shirt Size</Label>
+                    <Input
+                      id="profile-t_shirt_size"
+                      value={profileForm.t_shirt_size}
+                      onChange={(e) =>
+                        setProfileForm((p) => ({ ...p, t_shirt_size: e.target.value }))
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="profile-blood_group">Blood Group</Label>
+                    <Input
+                      id="profile-blood_group"
+                      value={profileForm.blood_group}
+                      onChange={(e) =>
+                        setProfileForm((p) => ({ ...p, blood_group: e.target.value }))
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+                  <div className="sm:col-span-2 flex gap-2 pt-2">
+                    <Button onClick={handleSaveProfile} disabled={savingProfile}>
+                      {savingProfile ? 'Saving...' : 'Save Profile'}
+                    </Button>
+                    <Button variant="outline" onClick={handleCancelEditProfile}>
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Name (Bangla)</p>
+                    <p className="text-base">{member.profile.name_bangla || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Father&apos;s Name</p>
+                    <p className="text-base">{member.profile.father_name || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Mother&apos;s Name</p>
+                    <p className="text-base">{member.profile.mother_name || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Gender</p>
+                    <p className="text-base">{member.profile.gender || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">SSC Year</p>
+                    <p className="text-base">{member.profile.ssc_year ?? 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Highest Degree</p>
+                    <p className="text-base">{member.profile.highest_educational_degree || 'N/A'}</p>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <p className="text-sm font-medium text-gray-500">Present Address</p>
+                    <p className="text-base whitespace-pre-wrap">{member.profile.present_address || 'N/A'}</p>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <p className="text-sm font-medium text-gray-500">Permanent Address</p>
+                    <p className="text-base whitespace-pre-wrap">{member.profile.permanent_address || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Profession</p>
+                    <p className="text-base">{member.profile.profession || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Designation</p>
+                    <p className="text-base">{member.profile.designation || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Institute</p>
+                    <p className="text-base">{member.profile.institute_name || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">T-shirt Size</p>
+                    <p className="text-base">{member.profile.t_shirt_size || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Blood Group</p>
+                    <p className="text-base">{member.profile.blood_group || 'N/A'}</p>
+                  </div>
+                  {(member.profile.photo || member.profile.signature) && (
+                    <div className="sm:col-span-2 flex flex-wrap gap-4">
+                      {member.profile.photo && (
+                        <div>
+                          <p className="text-sm font-medium text-gray-500 mb-1">Photo</p>
+                          <a
+                            href={member.profile.photo}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline text-sm"
+                          >
+                            View photo
+                          </a>
+                        </div>
+                      )}
+                      {member.profile.signature && (
+                        <div>
+                          <p className="text-sm font-medium text-gray-500 mb-1">Signature</p>
+                          <a
+                            href={member.profile.signature}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline text-sm"
+                          >
+                            View signature
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            ) : (
+              <p className="text-gray-500 text-sm">No profile data (member may not have an approved profile yet).</p>
+            )}
           </CardContent>
         </Card>
 

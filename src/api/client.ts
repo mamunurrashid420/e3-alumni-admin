@@ -202,6 +202,32 @@ class ApiClient {
     return response.data;
   }
 
+  async updateMemberProfile(
+    id: number,
+    data: {
+      name_bangla?: string | null;
+      father_name?: string | null;
+      mother_name?: string | null;
+      gender?: string | null;
+      jsc_year?: number | null;
+      ssc_year?: number | null;
+      highest_educational_degree?: string | null;
+      present_address?: string | null;
+      permanent_address?: string | null;
+      profession?: string | null;
+      designation?: string | null;
+      institute_name?: string | null;
+      t_shirt_size?: string | null;
+      blood_group?: string | null;
+    }
+  ): Promise<{ data: Member }> {
+    const response = await this.client.put<{ data: Member }>(
+      endpoints.memberProfile(id),
+      data
+    );
+    return response.data;
+  }
+
   // Payment Management
   async getPayments(status?: PaymentStatus): Promise<PaginatedResponse<Payment>> {
     const params = status ? { status } : {};

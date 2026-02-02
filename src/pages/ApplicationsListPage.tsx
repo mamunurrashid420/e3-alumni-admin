@@ -43,7 +43,7 @@ import {
 } from '@/components/ui/card';
 
 export function ApplicationsListPage() {
-  const [statusFilter, setStatusFilter] = useState<ApplicationStatus | undefined>();
+  const [statusFilter, setStatusFilter] = useState<ApplicationStatus | undefined>('PENDING');
   const { applications, loading, error, pagination, refetch } = useApplications(statusFilter);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<{
