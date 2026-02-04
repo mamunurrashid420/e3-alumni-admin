@@ -221,6 +221,10 @@ export interface RejectPaymentResponse {
   payment: Payment;
 }
 
+export interface PaymentsSummaryResponse {
+  total_approved_amount: string;
+}
+
 export interface MemberType {
   id: number;
   name: string;

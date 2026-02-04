@@ -100,6 +100,29 @@ export function ApplicationDetailPage() {
     }
   };
 
+  const isMobileViewport = () =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
+
+  const handleApproveClick = () => {
+    if (!application) return;
+    if (isMobileViewport()) {
+      const msg = `Approve application for ${application.full_name}? This will create a user account and send credentials via email.`;
+      if (window.confirm(msg)) handleApprove();
+    } else {
+      setConfirmDialog({ open: true, action: 'approve' });
+    }
+  };
+
+  const handleRejectClick = () => {
+    if (!application) return;
+    if (isMobileViewport()) {
+      const msg = `Reject application for ${application.full_name}? This cannot be undone.`;
+      if (window.confirm(msg)) handleReject();
+    } else {
+      setConfirmDialog({ open: true, action: 'reject' });
+    }
+  };
+
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'APPROVED':
@@ -161,14 +184,14 @@ export function ApplicationDetailPage() {
           {application.status === 'PENDING' && (
             <div className="flex gap-2">
               <Button
-                onClick={() => setConfirmDialog({ open: true, action: 'approve' })}
+                onClick={handleApproveClick}
                 disabled={actionLoading}
               >
                 {actionLoading ? 'Processing...' : 'Approve'}
               </Button>
               <Button
                 variant="destructive"
-                onClick={() => setConfirmDialog({ open: true, action: 'reject' })}
+                onClick={handleRejectClick}
                 disabled={actionLoading}
               >
                 {actionLoading ? 'Processing...' : 'Reject'}

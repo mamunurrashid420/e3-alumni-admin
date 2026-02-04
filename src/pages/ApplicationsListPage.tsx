@@ -120,17 +120,31 @@ export function ApplicationsListPage() {
     }
   };
 
+  const isMobileViewport = () =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
+
   const openConfirmDialog = (
     action: 'approve' | 'reject',
     id: number,
     name: string
   ) => {
-    setConfirmDialog({
-      open: true,
-      action,
-      applicationId: id,
-      applicationName: name,
-    });
+    if (isMobileViewport()) {
+      const msg =
+        action === 'approve'
+          ? `Approve application for ${name}? This will create a user account and send credentials via email.`
+          : `Reject application for ${name}? This cannot be undone.`;
+      if (window.confirm(msg)) {
+        if (action === 'approve') handleApprove(id);
+        else handleReject(id);
+      }
+    } else {
+      setConfirmDialog({
+        open: true,
+        action,
+        applicationId: id,
+        applicationName: name,
+      });
+    }
   };
 
   const handleConfirm = () => {

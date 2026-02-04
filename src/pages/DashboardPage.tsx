@@ -1,11 +1,14 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useApplications } from '@/hooks/useApplications';
+import { usePaymentsSummary } from '@/hooks/usePaymentsSummary';
+import { formatCurrency } from '@/lib/format';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { FileText } from 'lucide-react';
 
 export function DashboardPage() {
   const { applications, loading, pagination } = useApplications();
+  const { totalApprovedAmount, loading: incomeLoading } = usePaymentsSummary();
 
   const pendingCount = applications.filter((app) => app.status === 'PENDING').length;
   const approvedCount = applications.filter((app) => app.status === 'APPROVED').length;
@@ -32,6 +35,11 @@ export function DashboardPage() {
       value: rejectedCount,
       description: 'Rejected applications',
     },
+    {
+      title: 'Income',
+      value: totalApprovedAmount != null ? formatCurrency(Number(totalApprovedAmount)) : '—',
+      description: 'Total approved payments',
+    },
   ];
 
   return (
@@ -41,7 +49,7 @@ export function DashboardPage() {
         <p className="text-sm lg:text-base text-gray-600 mt-1">Welcome to the Alumni Admin Dashboard</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {stats.map((stat) => (
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -49,7 +57,9 @@ export function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {loading ? '...' : stat.value}
+                {(stat.title === 'Income' && incomeLoading) || (stat.title !== 'Income' && loading)
+                  ? '...'
+                  : stat.value}
               </div>
               <p className="text-xs text-gray-500 mt-1">{stat.description}</p>
             </CardContent>

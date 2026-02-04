@@ -26,6 +26,7 @@ export const endpoints = {
 
   // Payments
   payments: `${API_BASE}/payments`,
+  paymentsSummary: `${API_BASE}/payments/summary`,
   payment: (id: number) => `${API_BASE}/payments/${id}`,
   approvePayment: (id: number) => `${API_BASE}/payments/${id}/approve`,
   rejectPayment: (id: number) => `${API_BASE}/payments/${id}/reject`,

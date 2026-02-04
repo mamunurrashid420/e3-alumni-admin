@@ -16,6 +16,7 @@ import type {
   Payment,
   PaymentStatus,
   PaymentDetailResponse,
+  PaymentsSummaryResponse,
   ApprovePaymentResponse,
   RejectPaymentResponse,
   SelfDeclaration,
@@ -265,6 +266,13 @@ class ApiClient {
     const response = await this.client.get<PaginatedResponse<Payment>>(
       endpoints.payments,
       { params }
+    );
+    return response.data;
+  }
+
+  async getPaymentsSummary(): Promise<PaymentsSummaryResponse> {
+    const response = await this.client.get<PaymentsSummaryResponse>(
+      endpoints.paymentsSummary
     );
     return response.data;
   }
