@@ -47,6 +47,7 @@ export interface User {
   primary_member_type: string | null;
   secondary_member_type_id: number | null;
   member_id: string | null;
+  membership_expires_at: string | null;
   email_verified_at: string | null;
   created_at: string;
   updated_at: string;
@@ -182,6 +183,7 @@ export interface Member {
   primary_member_type: MembershipType | null;
   secondary_member_type: SecondaryMemberType | null;
   member_id: string | null;
+  membership_expires_at: string | null;
   email_verified_at: string | null;
   created_at: string;
   updated_at: string;

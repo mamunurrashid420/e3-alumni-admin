@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelfDeclarations } from '@/hooks/useSelfDeclarations';
 import { apiClient } from '@/api/client';
-import type { SelfDeclarationStatus } from '@/types/api';
+import type { SelfDeclarationStatus, SelfDeclaration } from '@/types/api';
 import { Button } from '@/components/ui/button';
+import { exportToCsv } from '@/lib/exportCsv';
 import {
   Table,
   TableBody,
@@ -44,12 +45,33 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Download } from 'lucide-react';
+
+const EXPORT_PER_PAGE = 10000;
+const SELF_DECLARATION_CSV_COLUMNS = [
+  { key: 'id' as const, header: 'ID' },
+  { key: 'name' as const, header: 'Name' },
+  {
+    key: (row: SelfDeclaration) => row.user?.email ?? '',
+    header: 'Email',
+  },
+  {
+    key: (row: SelfDeclaration) => row.secondary_member_type?.name ?? '',
+    header: 'Secondary Type',
+  },
+  { key: 'date' as const, header: 'Date' },
+  { key: 'status' as const, header: 'Status' },
+  { key: 'approved_at' as const, header: 'Approved At' },
+  { key: 'rejected_reason' as const, header: 'Rejected Reason' },
+  { key: 'created_at' as const, header: 'Created' },
+];
 
 export function SelfDeclarationsListPage() {
   const [statusFilter, setStatusFilter] = useState<SelfDeclarationStatus | undefined>();
   const { selfDeclarations, loading, error, pagination, refetch } =
     useSelfDeclarations(statusFilter);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [exportLoading, setExportLoading] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     action: 'approve' | 'reject' | null;
@@ -136,6 +158,19 @@ export function SelfDeclarationsListPage() {
     }
   };
 
+  const handleExportCsv = async () => {
+    setExportLoading(true);
+    try {
+      const res = await apiClient.getSelfDeclarations(statusFilter, EXPORT_PER_PAGE);
+      exportToCsv<SelfDeclaration>(res.data, 'self-declarations.csv', SELF_DECLARATION_CSV_COLUMNS);
+      toast.success(`Exported ${res.data.length} self-declarations`);
+    } catch (err) {
+      toast.error(handleApiError(err));
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
   if (loading && selfDeclarations.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -170,6 +205,15 @@ export function SelfDeclarationsListPage() {
             Manage and review self-declaration submissions
           </p>
         </div>
+        <Button
+          variant="outline"
+          onClick={handleExportCsv}
+          disabled={exportLoading}
+          className="gap-2"
+        >
+          <Download className="w-4 h-4" />
+          {exportLoading ? 'Exporting...' : 'Export CSV'}
+        </Button>
       </div>
 
       <Card>

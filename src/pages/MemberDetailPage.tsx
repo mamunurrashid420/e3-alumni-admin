@@ -20,6 +20,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { MEMBERSHIP_TYPE_LABELS } from '@/lib/constants';
 import { formatDate } from '@/lib/format';
 import { handleApiError } from '@/lib/errorHandler';
@@ -76,6 +84,9 @@ export function MemberDetailPage() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileForm, setProfileForm] = useState(emptyProfileForm);
+  const [renewDialogOpen, setRenewDialogOpen] = useState(false);
+  const [renewYears, setRenewYears] = useState<1 | 2 | 3>(1);
+  const [renewing, setRenewing] = useState(false);
 
   useEffect(() => {
     loadMember();
@@ -157,6 +168,24 @@ export function MemberDetailPage() {
       toast.error(errorMessage);
     } finally {
       setResending(false);
+    }
+  };
+
+  const handleRenewMembership = async () => {
+    if (!member?.id) return;
+    try {
+      setRenewing(true);
+      const response = await apiClient.renewMembership(member.id, renewYears);
+      setMember(response.data);
+      setRenewDialogOpen(false);
+      toast.success(
+        `Membership renewed. New expiry: ${formatDate(response.data.membership_expires_at ?? '')}`
+      );
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+    } finally {
+      setRenewing(false);
     }
   };
 
@@ -258,8 +287,62 @@ export function MemberDetailPage() {
               {resending ? 'Sending...' : 'Resend SMS Credentials'}
             </Button>
           )}
+          {!isEditing &&
+            (member.primary_member_type === 'GENERAL' ||
+              member.primary_member_type === 'ASSOCIATE') && (
+              <Button
+                variant="outline"
+                onClick={() => setRenewDialogOpen(true)}
+              >
+                Renew membership
+              </Button>
+            )}
         </div>
       </div>
+
+      <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Renew membership</DialogTitle>
+            <DialogDescription>
+              Extend {member.name}&apos;s membership. Select how many years to add.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="renew-years">Years to add</Label>
+            <Select
+              value={String(renewYears)}
+              onValueChange={(v) => setRenewYears(Number(v) as 1 | 2 | 3)}
+            >
+              <SelectTrigger id="renew-years" className="mt-2">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">1 year</SelectItem>
+                <SelectItem value="2">2 years</SelectItem>
+                <SelectItem value="3">3 years</SelectItem>
+              </SelectContent>
+            </Select>
+            {member.membership_expires_at && (
+              <p className="text-sm text-muted-foreground mt-2">
+                Current expiry: {formatDate(member.membership_expires_at)}
+              </p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setRenewDialogOpen(false)}
+              disabled={renewing}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleRenewMembership} disabled={renewing}>
+              {renewing ? 'Renewing...' : 'Renew'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {showPhoneChangedPrompt && (
         <Card className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30">
@@ -388,6 +471,18 @@ export function MemberDetailPage() {
                 </Badge>
               ) : (
                 <p className="text-base text-gray-400">N/A</p>
+              )}
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-500">
+                Membership Expires
+              </p>
+              {member.membership_expires_at ? (
+                <p className="text-base">{formatDate(member.membership_expires_at)}</p>
+              ) : (
+                <p className="text-base text-gray-400">
+                  {member.primary_member_type === 'LIFETIME' ? 'Never (Lifetime)' : 'N/A'}
+                </p>
               )}
             </div>
             <div>

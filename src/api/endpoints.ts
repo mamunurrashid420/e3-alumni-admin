@@ -22,6 +22,7 @@ export const endpoints = {
   updateMember: (id: number) => `${API_BASE}/members/${id}`,
   memberProfile: (id: number) => `${API_BASE}/members/${id}/profile`,
   resendSms: (id: number) => `${API_BASE}/members/${id}/resend-sms`,
+  renewMembership: (id: number) => `${API_BASE}/members/${id}/renew-membership`,
 
   // Payments
   payments: `${API_BASE}/payments`,

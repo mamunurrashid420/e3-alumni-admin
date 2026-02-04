@@ -136,9 +136,12 @@ class ApiClient {
 
   // Membership Applications methods
   async getApplications(
-    status?: ApplicationStatus
+    status?: ApplicationStatus,
+    perPage?: number
   ): Promise<PaginatedResponse<MembershipApplication>> {
-    const params = status ? { status } : {};
+    const params: Record<string, string | number> = {};
+    if (status) params.status = status;
+    if (perPage != null) params.per_page = perPage;
     const response = await this.client.get<
       PaginatedResponse<MembershipApplication>
     >(endpoints.applications, { params });
@@ -176,13 +179,14 @@ class ApiClient {
   async getMembers(
     search?: string,
     primaryMemberType?: MembershipType,
-    page: number = 1
+    page: number = 1,
+    perPage?: number
   ): Promise<PaginatedResponse<Member>> {
     const params: Record<string, string> = {};
     if (search) params.search = search;
     if (primaryMemberType) params.primary_member_type = primaryMemberType;
     if (page > 1) params.page = page.toString();
-    
+    if (perPage != null) params.per_page = perPage.toString();
     const response = await this.client.get<PaginatedResponse<Member>>(
       endpoints.members,
       { params }
@@ -214,6 +218,17 @@ class ApiClient {
     return response.data;
   }
 
+  async renewMembership(
+    id: number,
+    years: 1 | 2 | 3
+  ): Promise<{ data: Member }> {
+    const response = await this.client.post<{ data: Member }>(
+      endpoints.renewMembership(id),
+      { years }
+    );
+    return response.data;
+  }
+
   async updateMemberProfile(
     id: number,
     data: {
@@ -241,8 +256,12 @@ class ApiClient {
   }
 
   // Payment Management
-  async getPayments(status?: PaymentStatus): Promise<PaginatedResponse<Payment>> {
-    const params = status ? { status } : {};
+  async getPayments(
+    status?: PaymentStatus,
+    perPage?: number
+  ): Promise<PaginatedResponse<Payment>> {
+    const params: Record<string, string | number> = status ? { status } : {};
+    if (perPage != null) params.per_page = perPage;
     const response = await this.client.get<PaginatedResponse<Payment>>(
       endpoints.payments,
       { params }
@@ -284,9 +303,11 @@ class ApiClient {
 
   // Self Declaration Management
   async getSelfDeclarations(
-    status?: SelfDeclarationStatus
+    status?: SelfDeclarationStatus,
+    perPage?: number
   ): Promise<PaginatedResponse<SelfDeclaration>> {
-    const params = status ? { status } : {};
+    const params: Record<string, string | number> = status ? { status } : {};
+    if (perPage != null) params.per_page = perPage;
     const response = await this.client.get<PaginatedResponse<SelfDeclaration>>(
       endpoints.selfDeclarations,
       { params }
@@ -376,11 +397,13 @@ class ApiClient {
   // Scholarship Applications
   async getScholarshipApplications(
     status?: ScholarshipApplicationStatus,
-    scholarshipId?: number
+    scholarshipId?: number,
+    perPage?: number
   ): Promise<PaginatedResponse<ScholarshipApplication>> {
     const params: Record<string, string | number> = {};
     if (status) params.status = status;
     if (scholarshipId) params.scholarship_id = scholarshipId;
+    if (perPage != null) params.per_page = perPage;
     const response = await this.client.get<
       PaginatedResponse<ScholarshipApplication>
     >(endpoints.scholarshipApplications, { params });

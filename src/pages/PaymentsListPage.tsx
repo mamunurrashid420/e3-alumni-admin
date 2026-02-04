@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { usePayments } from '@/hooks/usePayments';
 import { apiClient } from '@/api/client';
-import type { PaymentStatus } from '@/types/api';
+import type { PaymentStatus, Payment } from '@/types/api';
 import { Button } from '@/components/ui/button';
+import { exportToCsv } from '@/lib/exportCsv';
 import {
   Table,
   TableBody,
@@ -41,11 +42,27 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Download } from 'lucide-react';
+
+const EXPORT_PER_PAGE = 10000;
+const PAYMENT_CSV_COLUMNS = [
+  { key: 'id' as const, header: 'ID' },
+  { key: 'member_id' as const, header: 'Member ID' },
+  { key: 'name' as const, header: 'Name' },
+  { key: 'address' as const, header: 'Address' },
+  { key: 'mobile_number' as const, header: 'Mobile' },
+  { key: 'payment_purpose' as const, header: 'Purpose' },
+  { key: 'payment_amount' as const, header: 'Amount' },
+  { key: 'status' as const, header: 'Status' },
+  { key: 'approved_at' as const, header: 'Approved At' },
+  { key: 'created_at' as const, header: 'Created' },
+];
 
 export function PaymentsListPage() {
   const [statusFilter, setStatusFilter] = useState<PaymentStatus | undefined>();
   const { payments, loading, error, pagination, refetch } = usePayments(statusFilter);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [exportLoading, setExportLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
@@ -149,6 +166,19 @@ export function PaymentsListPage() {
     }
   };
 
+  const handleExportCsv = async () => {
+    setExportLoading(true);
+    try {
+      const res = await apiClient.getPayments(statusFilter, EXPORT_PER_PAGE);
+      exportToCsv<Payment>(res.data, 'payments.csv', PAYMENT_CSV_COLUMNS);
+      toast.success(`Exported ${res.data.length} payments`);
+    } catch (err) {
+      toast.error(handleApiError(err));
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
   if (loading && payments.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -183,6 +213,15 @@ export function PaymentsListPage() {
             Manage and review payment submissions
           </p>
         </div>
+        <Button
+          variant="outline"
+          onClick={handleExportCsv}
+          disabled={exportLoading}
+          className="gap-2"
+        >
+          <Download className="w-4 h-4" />
+          {exportLoading ? 'Exporting...' : 'Export CSV'}
+        </Button>
       </div>
 
       <Card>

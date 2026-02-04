@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useApplications } from '@/hooks/useApplications';
 import { apiClient } from '@/api/client';
-import type { ApplicationStatus } from '@/types/api';
+import type { ApplicationStatus, MembershipApplication } from '@/types/api';
 import { Button } from '@/components/ui/button';
+import { exportToCsv } from '@/lib/exportCsv';
 import {
   Table,
   TableBody,
@@ -34,6 +35,17 @@ import { STATUS_LABELS } from '@/lib/constants';
 import { formatDate } from '@/lib/format';
 import { handleApiError } from '@/lib/errorHandler';
 import { toast } from 'sonner';
+import { Download } from 'lucide-react';
+
+const EXPORT_PER_PAGE = 10000;
+const APPLICATION_CSV_COLUMNS = [
+  { key: 'id' as const, header: 'ID' },
+  { key: 'full_name' as const, header: 'Name' },
+  { key: 'email' as const, header: 'Email' },
+  { key: 'membership_type' as const, header: 'Type' },
+  { key: 'status' as const, header: 'Status' },
+  { key: 'created_at' as const, header: 'Created' },
+];
 import {
   Card,
   CardContent,
@@ -46,6 +58,7 @@ export function ApplicationsListPage() {
   const [statusFilter, setStatusFilter] = useState<ApplicationStatus | undefined>('PENDING');
   const { applications, loading, error, pagination, refetch } = useApplications(statusFilter);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [exportLoading, setExportLoading] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     action: 'approve' | 'reject' | null;
@@ -57,6 +70,23 @@ export function ApplicationsListPage() {
     applicationId: null,
     applicationName: '',
   });
+
+  const handleExportCsv = async () => {
+    setExportLoading(true);
+    try {
+      const res = await apiClient.getApplications(statusFilter, EXPORT_PER_PAGE);
+      exportToCsv<MembershipApplication>(
+        res.data,
+        'membership-applications.csv',
+        APPLICATION_CSV_COLUMNS
+      );
+      toast.success(`Exported ${res.data.length} applications`);
+    } catch (err) {
+      toast.error(handleApiError(err));
+    } finally {
+      setExportLoading(false);
+    }
+  };
 
   const handleApprove = async (id: number) => {
     setActionLoading(id);
@@ -158,6 +188,15 @@ export function ApplicationsListPage() {
             Manage and review membership applications
           </p>
         </div>
+        <Button
+          variant="outline"
+          onClick={handleExportCsv}
+          disabled={exportLoading}
+          className="gap-2"
+        >
+          <Download className="w-4 h-4" />
+          {exportLoading ? 'Exporting...' : 'Export CSV'}
+        </Button>
       </div>
 
       <Card>

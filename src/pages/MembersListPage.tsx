@@ -1,8 +1,10 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMembers } from '@/hooks/useMembers';
-import type { MembershipType } from '@/types/api';
+import { apiClient } from '@/api/client';
+import type { MembershipType, Member } from '@/types/api';
 import { Button } from '@/components/ui/button';
+import { exportToCsv } from '@/lib/exportCsv';
 import {
   Table,
   TableBody,
@@ -29,7 +31,53 @@ import {
 } from '@/components/ui/card';
 import { MEMBERSHIP_TYPE_LABELS } from '@/lib/constants';
 import { formatDate } from '@/lib/format';
-import { Search, X } from 'lucide-react';
+import { handleApiError } from '@/lib/errorHandler';
+import { toast } from 'sonner';
+import { Search, X, Download } from 'lucide-react';
+
+const EXPORT_PER_PAGE = 10000;
+const MEMBER_CSV_COLUMNS = [
+  { key: 'id' as const, header: 'ID' },
+  { key: 'name' as const, header: 'Name' },
+  { key: 'email' as const, header: 'Email' },
+  { key: 'phone' as const, header: 'Phone' },
+  { key: 'member_id' as const, header: 'Member ID' },
+  { key: 'primary_member_type' as const, header: 'Primary Type' },
+  { key: 'membership_expires_at' as const, header: 'Expires' },
+  {
+    key: (row: Member) => row.secondary_member_type?.name ?? '',
+    header: 'Secondary Type',
+  },
+  { key: 'email_verified_at' as const, header: 'Email Verified' },
+  { key: 'created_at' as const, header: 'Created' },
+  // Profile fields
+  { key: (row: Member) => row.profile?.name_bangla ?? '', header: 'Name (Bangla)' },
+  { key: (row: Member) => row.profile?.father_name ?? '', header: 'Father Name' },
+  { key: (row: Member) => row.profile?.mother_name ?? '', header: 'Mother Name' },
+  { key: (row: Member) => row.profile?.gender ?? '', header: 'Gender' },
+  { key: (row: Member) => row.profile?.jsc_year ?? '', header: 'JSC Year' },
+  { key: (row: Member) => row.profile?.ssc_year ?? '', header: 'SSC Year' },
+  {
+    key: (row: Member) => row.profile?.highest_educational_degree ?? '',
+    header: 'Highest Degree',
+  },
+  {
+    key: (row: Member) => row.profile?.present_address ?? '',
+    header: 'Present Address',
+  },
+  {
+    key: (row: Member) => row.profile?.permanent_address ?? '',
+    header: 'Permanent Address',
+  },
+  { key: (row: Member) => row.profile?.profession ?? '', header: 'Profession' },
+  { key: (row: Member) => row.profile?.designation ?? '', header: 'Designation' },
+  {
+    key: (row: Member) => row.profile?.institute_name ?? '',
+    header: 'Institute Name',
+  },
+  { key: (row: Member) => row.profile?.t_shirt_size ?? '', header: 'T-Shirt Size' },
+  { key: (row: Member) => row.profile?.blood_group ?? '', header: 'Blood Group' },
+];
 
 export function MembersListPage() {
   const navigate = useNavigate();
@@ -76,6 +124,25 @@ export function MembersListPage() {
     setCurrentPage(1);
   }, []);
 
+  const [exportLoading, setExportLoading] = useState(false);
+  const handleExportCsv = useCallback(async () => {
+    setExportLoading(true);
+    try {
+      const res = await apiClient.getMembers(
+        debouncedSearch || undefined,
+        primaryMemberType,
+        1,
+        EXPORT_PER_PAGE
+      );
+      exportToCsv<Member>(res.data, 'members.csv', MEMBER_CSV_COLUMNS);
+      toast.success(`Exported ${res.data.length} members`);
+    } catch (err) {
+      toast.error(handleApiError(err));
+    } finally {
+      setExportLoading(false);
+    }
+  }, [debouncedSearch, primaryMemberType]);
+
   if (loading && members.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -110,6 +177,15 @@ export function MembersListPage() {
             View and manage all member users
           </p>
         </div>
+        <Button
+          variant="outline"
+          onClick={handleExportCsv}
+          disabled={exportLoading}
+          className="gap-2"
+        >
+          <Download className="w-4 h-4" />
+          {exportLoading ? 'Exporting...' : 'Export CSV'}
+        </Button>
       </div>
 
       <Card>
@@ -177,6 +253,7 @@ export function MembersListPage() {
                     <TableHead>Email</TableHead>
                     <TableHead>Member ID</TableHead>
                     <TableHead>Primary Type</TableHead>
+                    <TableHead>Expires</TableHead>
                     <TableHead>Secondary Type</TableHead>
                     <TableHead>Email Verified</TableHead>
                     <TableHead>Created</TableHead>
@@ -206,6 +283,17 @@ export function MembersListPage() {
                           </Badge>
                         ) : (
                           <span className="text-gray-400">N/A</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {member.membership_expires_at ? (
+                          formatDate(member.membership_expires_at)
+                        ) : (
+                          <span className="text-gray-400">
+                            {member.primary_member_type === 'LIFETIME'
+                              ? 'Never'
+                              : 'N/A'}
+                          </span>
                         )}
                       </TableCell>
                       <TableCell>

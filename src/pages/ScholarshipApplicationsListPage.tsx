@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useScholarshipApplications } from '@/hooks/useScholarshipApplications';
-import type { ScholarshipApplicationStatus } from '@/types/api';
+import { apiClient } from '@/api/client';
+import type { ScholarshipApplicationStatus, ScholarshipApplication } from '@/types/api';
 import { Button } from '@/components/ui/button';
+import { exportToCsv } from '@/lib/exportCsv';
 import {
   Table,
   TableBody,
@@ -28,6 +30,23 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { handleApiError } from '@/lib/errorHandler';
+import { toast } from 'sonner';
+import { Download } from 'lucide-react';
+
+const EXPORT_PER_PAGE = 10000;
+const SCHOLARSHIP_APPLICATION_CSV_COLUMNS = [
+  { key: 'id' as const, header: 'ID' },
+  { key: 'scholarship_id' as const, header: 'Scholarship ID' },
+  { key: (row: ScholarshipApplication) => row.scholarship?.title ?? '', header: 'Scholarship' },
+  { key: 'applicant_name' as const, header: 'Applicant Name' },
+  { key: 'applicant_email' as const, header: 'Applicant Email' },
+  { key: 'applicant_phone' as const, header: 'Applicant Phone' },
+  { key: 'class_or_grade' as const, header: 'Class/Grade' },
+  { key: 'school_name' as const, header: 'School' },
+  { key: 'status' as const, header: 'Status' },
+  { key: 'created_at' as const, header: 'Created' },
+];
 
 const SCHOLARSHIP_STATUSES: ScholarshipApplicationStatus[] = [
   'PENDING',
@@ -46,6 +65,28 @@ export function ScholarshipApplicationsListPage() {
     pagination,
     refetch,
   } = useScholarshipApplications(statusFilter);
+  const [exportLoading, setExportLoading] = useState(false);
+
+  const handleExportCsv = async () => {
+    setExportLoading(true);
+    try {
+      const res = await apiClient.getScholarshipApplications(
+        statusFilter,
+        undefined,
+        EXPORT_PER_PAGE
+      );
+      exportToCsv<ScholarshipApplication>(
+        res.data,
+        'scholarship-applications.csv',
+        SCHOLARSHIP_APPLICATION_CSV_COLUMNS
+      );
+      toast.success(`Exported ${res.data.length} applications`);
+    } catch (err) {
+      toast.error(handleApiError(err));
+    } finally {
+      setExportLoading(false);
+    }
+  };
 
   const getStatusBadgeVariant = (status: ScholarshipApplicationStatus) => {
     switch (status) {
@@ -94,6 +135,15 @@ export function ScholarshipApplicationsListPage() {
             Review and manage scholarship applications
           </p>
         </div>
+        <Button
+          variant="outline"
+          onClick={handleExportCsv}
+          disabled={exportLoading}
+          className="gap-2"
+        >
+          <Download className="w-4 h-4" />
+          {exportLoading ? 'Exporting...' : 'Export CSV'}
+        </Button>
       </div>
 
       <Card>
