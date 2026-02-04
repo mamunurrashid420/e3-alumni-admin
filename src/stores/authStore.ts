@@ -2,6 +2,9 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { User } from '@/types/api';
 import { apiClient } from '@/api/client';
+import { getCookie, authCookieStorage } from '@/lib/cookie';
+
+const AUTH_TOKEN_COOKIE = 'auth_token';
 
 interface AuthState {
   user: User | null;
@@ -28,7 +31,7 @@ export const useAuthStore = create<AuthStore>()(
     (set, get) => ({
       // State
       user: null,
-      token: localStorage.getItem('auth_token'),
+      token: getCookie(AUTH_TOKEN_COOKIE),
       isAuthenticated: false,
       isLoading: false,
       error: null,
@@ -84,7 +87,7 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       checkAuth: async () => {
-        const token = get().token || localStorage.getItem('auth_token');
+        const token = get().token || getCookie(AUTH_TOKEN_COOKIE);
         if (!token) {
           set({
             user: null,
@@ -134,7 +137,7 @@ export const useAuthStore = create<AuthStore>()(
     }),
     {
       name: STORAGE_KEY,
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => authCookieStorage),
       partialize: (state) => ({
         token: state.token,
         user: state.user,

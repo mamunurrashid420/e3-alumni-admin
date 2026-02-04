@@ -101,7 +101,7 @@ export function PaymentDetailPage() {
     if (!payment?.receipt_file) return;
 
     try {
-      const token = localStorage.getItem('auth_token');
+      const token = apiClient.getToken();
       if (!token) {
         toast.error('Authentication required');
         return;
