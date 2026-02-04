@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { usePayments } from '@/hooks/usePayments';
 import { apiClient } from '@/api/client';
@@ -46,6 +46,7 @@ export function PaymentsListPage() {
   const [statusFilter, setStatusFilter] = useState<PaymentStatus | undefined>();
   const { payments, loading, error, pagination, refetch } = usePayments(statusFilter);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     action: 'approve' | 'reject' | null;
@@ -57,6 +58,15 @@ export function PaymentsListPage() {
     paymentId: null,
     paymentName: '',
   });
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024); // lg breakpoint
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleApprove = async (id: number) => {
     setActionLoading(id);
@@ -93,12 +103,29 @@ export function PaymentsListPage() {
     id: number,
     name: string
   ) => {
-    setConfirmDialog({
-      open: true,
-      action,
-      paymentId: id,
-      paymentName: name,
-    });
+    if (isMobile) {
+      // Use browser confirm on mobile
+      const actionText = action === 'approve' ? 'approve' : 'reject';
+      const message = `Are you sure you want to ${actionText} the payment for ${name}?${
+        action === 'reject' ? ' This action cannot be undone.' : ''
+      }`;
+      
+      if (window.confirm(message)) {
+        if (action === 'approve') {
+          handleApprove(id);
+        } else {
+          handleReject(id);
+        }
+      }
+    } else {
+      // Use AlertDialog on desktop
+      setConfirmDialog({
+        open: true,
+        action,
+        paymentId: id,
+        paymentName: name,
+      });
+    }
   };
 
   const handleConfirm = () => {
@@ -148,11 +175,11 @@ export function PaymentsListPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 lg:space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Payments</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-2xl xl:text-3xl font-bold">Payments</h1>
+          <p className="text-sm lg:text-base text-gray-600 mt-1">
             Manage and review payment submissions
           </p>
         </div>
@@ -160,7 +187,7 @@ export function PaymentsListPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <CardTitle>Payments</CardTitle>
               <CardDescription>
@@ -172,7 +199,7 @@ export function PaymentsListPage() {
                 )}
               </CardDescription>
             </div>
-            <div className="w-48">
+            <div className="w-full sm:w-48">
               <Select
                 value={statusFilter || 'all'}
                 onValueChange={(value) =>
@@ -299,39 +326,41 @@ export function PaymentsListPage() {
         </CardContent>
       </Card>
 
-      <AlertDialog open={confirmDialog.open} onOpenChange={(open) => 
-        setConfirmDialog(prev => ({ ...prev, open }))
-      }>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {confirmDialog.action === 'approve'
-                ? 'Approve Payment'
-                : 'Reject Payment'}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to {confirmDialog.action} the payment
-              for <strong>{confirmDialog.paymentName}</strong>? This action
-              {confirmDialog.action === 'approve'
-                ? ' will mark the payment as approved.'
-                : ' cannot be undone.'}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirm}
-              className={
-                confirmDialog.action === 'reject'
-                  ? 'bg-red-600 hover:bg-red-700'
-                  : ''
-              }
-            >
-              {confirmDialog.action === 'approve' ? 'Approve' : 'Reject'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {!isMobile && (
+        <AlertDialog open={confirmDialog.open} onOpenChange={(open) => 
+          setConfirmDialog(prev => ({ ...prev, open }))
+        }>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {confirmDialog.action === 'approve'
+                  ? 'Approve Payment'
+                  : 'Reject Payment'}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to {confirmDialog.action} the payment
+                for <strong>{confirmDialog.paymentName}</strong>? This action
+                {confirmDialog.action === 'approve'
+                  ? ' will mark the payment as approved.'
+                  : ' cannot be undone.'}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleConfirm}
+                className={
+                  confirmDialog.action === 'reject'
+                    ? 'bg-red-600 hover:bg-red-700'
+                    : ''
+                }
+              >
+                {confirmDialog.action === 'approve' ? 'Approve' : 'Reject'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
   );
 }

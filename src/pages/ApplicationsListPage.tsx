@@ -150,11 +150,11 @@ export function ApplicationsListPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 lg:space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Membership Applications</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-2xl xl:text-3xl font-bold">Membership Applications</h1>
+          <p className="text-sm lg:text-base text-gray-600 mt-1">
             Manage and review membership applications
           </p>
         </div>
@@ -162,7 +162,7 @@ export function ApplicationsListPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <CardTitle>Applications</CardTitle>
               <CardDescription>
@@ -174,7 +174,7 @@ export function ApplicationsListPage() {
                 )}
               </CardDescription>
             </div>
-            <div className="w-48">
+            <div className="w-full sm:w-48">
               <Select
                 value={statusFilter || 'all'}
                 onValueChange={(value) =>

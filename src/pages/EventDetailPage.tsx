@@ -86,7 +86,7 @@ export function EventDetailPage() {
           <Button variant="ghost" size="icon" onClick={() => navigate('/events')}>
             <ArrowLeft className="w-4 h-4" />
           </Button>
-          <h1 className="text-3xl font-bold">{event.title}</h1>
+          <h1 className="text-2xl xl:text-3xl font-bold">{event.title}</h1>
         </div>
         <Button onClick={() => navigate(`/events/${event.id}/edit`)}>
           <Pencil className="w-4 h-4 mr-2" />

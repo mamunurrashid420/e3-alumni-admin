@@ -75,7 +75,7 @@ export function CreateEventPage() {
         <Button variant="ghost" size="icon" onClick={() => navigate('/events')}>
           <ArrowLeft className="w-4 h-4" />
         </Button>
-        <h1 className="text-3xl font-bold">New Event</h1>
+        <h1 className="text-2xl xl:text-3xl font-bold">New Event</h1>
       </div>
 
       <Card>

@@ -148,11 +148,11 @@ export function AdvisoryBodyListPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 lg:space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Advisory Body</h1>
-          <p className="text-gray-600 mt-1">Manage advisory body members</p>
+          <h1 className="text-2xl xl:text-3xl font-bold">Advisory Body</h1>
+          <p className="text-sm lg:text-base text-gray-600 mt-1">Manage advisory body members</p>
         </div>
         <Button onClick={openAdd}>Add Member</Button>
       </div>

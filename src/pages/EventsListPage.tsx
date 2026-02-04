@@ -98,18 +98,18 @@ export function EventsListPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 lg:space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Events</h1>
-          <p className="text-gray-600 mt-1">Manage events and registrations</p>
+          <h1 className="text-2xl xl:text-3xl font-bold">Events</h1>
+          <p className="text-sm lg:text-base text-gray-600 mt-1">Manage events and registrations</p>
         </div>
         <Button onClick={() => navigate('/events/new')}>Add Event</Button>
       </div>
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <CardTitle>Events</CardTitle>
               <CardDescription>{items.length} event(s)</CardDescription>
@@ -118,7 +118,7 @@ export function EventsListPage() {
               value={statusFilter}
               onValueChange={(v) => setStatusFilter(v as EventStatus | 'all')}
             >
-              <SelectTrigger className="w-[140px]">
+              <SelectTrigger className="w-full sm:w-[140px]">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>

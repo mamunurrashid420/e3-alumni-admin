@@ -89,8 +89,8 @@ export function ScholarshipApplicationsListPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Scholarship Applications</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-2xl xl:text-3xl font-bold">Scholarship Applications</h1>
+          <p className="text-sm lg:text-base text-gray-600 mt-1">
             Review and manage scholarship applications
           </p>
         </div>
@@ -98,7 +98,7 @@ export function ScholarshipApplicationsListPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <CardTitle>Applications</CardTitle>
               <CardDescription>
@@ -110,7 +110,7 @@ export function ScholarshipApplicationsListPage() {
                 )}
               </CardDescription>
             </div>
-            <div className="w-48">
+            <div className="w-full sm:w-48">
               <Select
                 value={statusFilter || 'all'}
                 onValueChange={(value) =>

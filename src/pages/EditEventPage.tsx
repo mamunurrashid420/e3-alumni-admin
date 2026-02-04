@@ -190,7 +190,7 @@ export function EditEventPage() {
           <Button variant="ghost" size="icon" onClick={() => navigate('/events')}>
             <ArrowLeft className="w-4 h-4" />
           </Button>
-          <h1 className="text-3xl font-bold">Edit Event</h1>
+          <h1 className="text-2xl xl:text-3xl font-bold">Edit Event</h1>
         </div>
         {isOpen && (
           <Button variant="destructive" onClick={() => setCloseDialogOpen(true)}>

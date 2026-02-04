@@ -15,199 +15,155 @@ import {
   BookOpen,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  Sheet,
+  SheetContent,
+} from '@/components/ui/sheet';
 
-export function Sidebar() {
+interface SidebarProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+function SidebarNav({ onLinkClick }: { onLinkClick?: () => void }) {
+  const linkClass = ({ isActive }: { isActive: boolean }) =>
+    cn(
+      'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
+      isActive
+        ? 'bg-blue-50 text-blue-700 font-medium'
+        : 'text-gray-700 hover:bg-gray-50'
+    );
+
   return (
-    <aside className="w-64 bg-white border-r h-[calc(100vh-4rem)] fixed left-0 top-16">
-      <nav className="p-4 space-y-2">
+    <nav className="p-4 space-y-2">
+      <NavLink
+        to="/dashboard"
+        className={linkClass}
+        onClick={onLinkClick}
+      >
+        <LayoutDashboard className="w-5 h-5" />
+        <span>Dashboard</span>
+      </NavLink>
+      <NavLink
+        to="/applications"
+        className={linkClass}
+        onClick={onLinkClick}
+      >
+        <FileText className="w-5 h-5" />
+        <span>Membership Applications</span>
+      </NavLink>
+      <NavLink
+        to="/self-declarations"
+        className={linkClass}
+        onClick={onLinkClick}
+      >
+        <ClipboardCheck className="w-5 h-5" />
+        <span>Self Declarations</span>
+      </NavLink>
+      <NavLink
+        to="/members"
+        className={linkClass}
+        onClick={onLinkClick}
+      >
+        <Users className="w-5 h-5" />
+        <span>Members</span>
+      </NavLink>
+      <NavLink
+        to="/payments"
+        className={linkClass}
+        onClick={onLinkClick}
+      >
+        <CreditCard className="w-5 h-5" />
+        <span>Payments</span>
+      </NavLink>
+      <NavLink
+        to="/scholarships"
+        className={linkClass}
+        onClick={onLinkClick}
+      >
+        <GraduationCap className="w-5 h-5" />
+        <span>Scholarships</span>
+      </NavLink>
+      <NavLink
+        to="/scholarship-applications"
+        className={linkClass}
+        onClick={onLinkClick}
+      >
+        <BookOpen className="w-5 h-5" />
+        <span>Scholarship Applications</span>
+      </NavLink>
+      <NavLink
+        to="/downloads"
+        className={linkClass}
+        onClick={onLinkClick}
+      >
+        <Download className="w-5 h-5" />
+        <span>Downloads</span>
+      </NavLink>
+      <NavLink
+        to="/events"
+        className={linkClass}
+        onClick={onLinkClick}
+      >
+        <Calendar className="w-5 h-5" />
+        <span>Events</span>
+      </NavLink>
+      <div className="pt-4 border-t">
         <NavLink
-          to="/dashboard"
-          className={({ isActive }) =>
-            cn(
-              'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-              isActive
-                ? 'bg-blue-50 text-blue-700 font-medium'
-                : 'text-gray-700 hover:bg-gray-50'
-            )
-          }
+          to="/about/convening-committee"
+          className={linkClass}
+          onClick={onLinkClick}
         >
-          <LayoutDashboard className="w-5 h-5" />
-          <span>Dashboard</span>
+          <UsersRound className="w-5 h-5" />
+          <span>Convening Committee</span>
         </NavLink>
         <NavLink
-          to="/applications"
-          className={({ isActive }) =>
-            cn(
-              'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-              isActive
-                ? 'bg-blue-50 text-blue-700 font-medium'
-                : 'text-gray-700 hover:bg-gray-50'
-            )
-          }
+          to="/about/advisory-body"
+          className={linkClass}
+          onClick={onLinkClick}
         >
-          <FileText className="w-5 h-5" />
-          <span>Membership Applications</span>
+          <ShieldCheck className="w-5 h-5" />
+          <span>Advisory Body</span>
         </NavLink>
         <NavLink
-          to="/self-declarations"
-          className={({ isActive }) =>
-            cn(
-              'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-              isActive
-                ? 'bg-blue-50 text-blue-700 font-medium'
-                : 'text-gray-700 hover:bg-gray-50'
-            )
-          }
+          to="/about/honor-board"
+          className={linkClass}
+          onClick={onLinkClick}
         >
-          <ClipboardCheck className="w-5 h-5" />
-          <span>Self Declarations</span>
+          <Award className="w-5 h-5" />
+          <span>Honor Board</span>
         </NavLink>
         <NavLink
-          to="/members"
-          className={({ isActive }) =>
-            cn(
-              'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-              isActive
-                ? 'bg-blue-50 text-blue-700 font-medium'
-                : 'text-gray-700 hover:bg-gray-50'
-            )
-          }
+          to="/about/batch-representatives"
+          className={linkClass}
+          onClick={onLinkClick}
         >
-          <Users className="w-5 h-5" />
-          <span>Members</span>
+          <UserCircle className="w-5 h-5" />
+          <span>Batch Representatives</span>
         </NavLink>
-        <NavLink
-          to="/payments"
-          className={({ isActive }) =>
-            cn(
-              'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-              isActive
-                ? 'bg-blue-50 text-blue-700 font-medium'
-                : 'text-gray-700 hover:bg-gray-50'
-            )
-          }
-        >
-          <CreditCard className="w-5 h-5" />
-          <span>Payments</span>
-        </NavLink>
-        <NavLink
-          to="/scholarships"
-          className={({ isActive }) =>
-            cn(
-              'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-              isActive
-                ? 'bg-blue-50 text-blue-700 font-medium'
-                : 'text-gray-700 hover:bg-gray-50'
-            )
-          }
-        >
-          <GraduationCap className="w-5 h-5" />
-          <span>Scholarships</span>
-        </NavLink>
-        <NavLink
-          to="/scholarship-applications"
-          className={({ isActive }) =>
-            cn(
-              'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-              isActive
-                ? 'bg-blue-50 text-blue-700 font-medium'
-                : 'text-gray-700 hover:bg-gray-50'
-            )
-          }
-        >
-          <BookOpen className="w-5 h-5" />
-          <span>Scholarship Applications</span>
-        </NavLink>
-        <NavLink
-          to="/downloads"
-          className={({ isActive }) =>
-            cn(
-              'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-              isActive
-                ? 'bg-blue-50 text-blue-700 font-medium'
-                : 'text-gray-700 hover:bg-gray-50'
-            )
-          }
-        >
-          <Download className="w-5 h-5" />
-          <span>Downloads</span>
-        </NavLink>
-        <NavLink
-          to="/events"
-          className={({ isActive }) =>
-            cn(
-              'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-              isActive
-                ? 'bg-blue-50 text-blue-700 font-medium'
-                : 'text-gray-700 hover:bg-gray-50'
-            )
-          }
-        >
-          <Calendar className="w-5 h-5" />
-          <span>Events</span>
-        </NavLink>
-        <div className="pt-4 border-t">
-          {/* <p className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-            About Us
-          </p> */}
-          <NavLink
-            to="/about/convening-committee"
-            className={({ isActive }) =>
-              cn(
-                'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-                isActive
-                  ? 'bg-blue-50 text-blue-700 font-medium'
-                  : 'text-gray-700 hover:bg-gray-50'
-              )
-            }
-          >
-            <UsersRound className="w-5 h-5" />
-            <span>Convening Committee</span>
-          </NavLink>
-          <NavLink
-            to="/about/advisory-body"
-            className={({ isActive }) =>
-              cn(
-                'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-                isActive
-                  ? 'bg-blue-50 text-blue-700 font-medium'
-                  : 'text-gray-700 hover:bg-gray-50'
-              )
-            }
-          >
-            <ShieldCheck className="w-5 h-5" />
-            <span>Advisory Body</span>
-          </NavLink>
-          <NavLink
-            to="/about/honor-board"
-            className={({ isActive }) =>
-              cn(
-                'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-                isActive
-                  ? 'bg-blue-50 text-blue-700 font-medium'
-                  : 'text-gray-700 hover:bg-gray-50'
-              )
-            }
-          >
-            <Award className="w-5 h-5" />
-            <span>Honor Board</span>
-          </NavLink>
-          <NavLink
-            to="/about/batch-representatives"
-            className={({ isActive }) =>
-              cn(
-                'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-                isActive
-                  ? 'bg-blue-50 text-blue-700 font-medium'
-                  : 'text-gray-700 hover:bg-gray-50'
-              )
-            }
-          >
-            <UserCircle className="w-5 h-5" />
-            <span>Batch Representatives</span>
-          </NavLink>
-        </div>
-      </nav>
-    </aside>
+      </div>
+    </nav>
+  );
+}
+
+export function Sidebar({ open, onOpenChange }: SidebarProps) {
+  const handleLinkClick = () => {
+    onOpenChange?.(false);
+  };
+
+  return (
+    <>
+      {/* Desktop sidebar - fixed, only visible on lg+ */}
+      <aside className="hidden lg:block w-64 bg-white border-r h-[calc(100vh-4rem)] fixed left-0 top-16">
+        <SidebarNav />
+      </aside>
+
+      {/* Mobile sidebar - Sheet, only visible below lg */}
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent side="left" className="w-64 p-0 lg:hidden">
+          <SidebarNav onLinkClick={handleLinkClick} />
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }

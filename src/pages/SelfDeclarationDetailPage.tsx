@@ -152,7 +152,7 @@ export function SelfDeclarationDetailPage() {
       {/* Admin Actions Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Self-Declaration #{selfDeclaration.id}</h1>
+          <h1 className="text-2xl xl:text-3xl font-bold">Self-Declaration #{selfDeclaration.id}</h1>
           <p className="text-gray-600 mt-1">
             <Link
               to="/self-declarations"
