@@ -53,6 +53,7 @@ export function EditEventPage() {
   const [endAt, setEndAt] = useState('');
   const [status, setStatus] = useState<EventStatus>('draft');
   const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
+  const [coverPhotoPreview, setCoverPhotoPreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
   const [closePhotos, setClosePhotos] = useState<File[]>([]);
@@ -68,6 +69,19 @@ export function EditEventPage() {
       setStatus(event.status);
     }
   }, [event]);
+
+  // Handle cover photo preview
+  useEffect(() => {
+    if (coverPhoto) {
+      const url = URL.createObjectURL(coverPhoto);
+      setCoverPhotoPreview(url);
+      return () => {
+        URL.revokeObjectURL(url);
+      };
+    } else {
+      setCoverPhotoPreview(null);
+    }
+  }, [coverPhoto]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -268,7 +282,24 @@ export function EditEventPage() {
                 onChange={(e) => setCoverPhoto(e.target.files?.[0] ?? null)}
               />
               {event.cover_photo && !coverPhoto && (
-                <p className="text-xs text-gray-500">Current cover photo is set.</p>
+                <div className="mt-2">
+                  <p className="text-xs text-gray-500 mb-2">Current cover photo:</p>
+                  <img
+                    src={event.cover_photo}
+                    alt={event.title}
+                    className="w-full max-w-md h-48 object-cover rounded-lg border"
+                  />
+                </div>
+              )}
+              {coverPhotoPreview && (
+                <div className="mt-2">
+                  <p className="text-xs text-gray-500 mb-2">New cover photo preview:</p>
+                  <img
+                    src={coverPhotoPreview}
+                    alt="Preview"
+                    className="w-full max-w-md h-48 object-cover rounded-lg border"
+                  />
+                </div>
               )}
             </div>
             <div className="flex gap-2">
