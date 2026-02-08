@@ -28,6 +28,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { MEMBERSHIP_TYPE_LABELS } from '@/lib/constants';
 import { formatDate } from '@/lib/format';
 import { handleApiError } from '@/lib/errorHandler';
@@ -87,6 +97,9 @@ export function MemberDetailPage() {
   const [renewDialogOpen, setRenewDialogOpen] = useState(false);
   const [renewYears, setRenewYears] = useState<1 | 2 | 3>(1);
   const [renewing, setRenewing] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [disabling, setDisabling] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     loadMember();
@@ -189,6 +202,50 @@ export function MemberDetailPage() {
     }
   };
 
+  const handleDisable = async () => {
+    if (!member?.id) return;
+    if (!confirm(`Disable ${member.name}? They will no longer be able to log in.`)) return;
+    try {
+      setDisabling(true);
+      const updated = await apiClient.disableMember(member.id);
+      setMember(updated);
+      toast.success('Member disabled');
+    } catch (err) {
+      toast.error(handleApiError(err));
+    } finally {
+      setDisabling(false);
+    }
+  };
+
+  const handleEnable = async () => {
+    if (!member?.id) return;
+    try {
+      setDisabling(true);
+      const updated = await apiClient.enableMember(member.id);
+      setMember(updated);
+      toast.success('Member re-enabled');
+    } catch (err) {
+      toast.error(handleApiError(err));
+    } finally {
+      setDisabling(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!member?.id) return;
+    try {
+      setDeleting(true);
+      await apiClient.deleteMember(member.id);
+      toast.success('Member deleted');
+      setDeleteDialogOpen(false);
+      navigate('/members');
+    } catch (err) {
+      toast.error(handleApiError(err));
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const handleEditProfile = () => {
     if (!member?.profile) return;
     setProfileForm(profileToForm(member.profile));
@@ -265,14 +322,19 @@ export function MemberDetailPage() {
     <div className="space-y-4 lg:space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl xl:text-3xl font-bold">{member.name}</h1>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-2xl xl:text-3xl font-bold">{member.name}</h1>
+            {member.disabled_at && (
+              <Badge variant="destructive">Disabled</Badge>
+            )}
+          </div>
           <p className="text-gray-600 mt-1">
             <Link to="/members" className="text-blue-600 hover:underline">
               ← Back to members
             </Link>
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           {!isEditing ? (
             <Button variant="outline" onClick={handleEdit}>
               Edit
@@ -297,8 +359,61 @@ export function MemberDetailPage() {
                 Renew membership
               </Button>
             )}
+          {!isEditing && (
+            member.disabled_at ? (
+              <Button
+                variant="outline"
+                onClick={handleEnable}
+                disabled={disabling}
+              >
+                {disabling ? 'Enabling...' : 'Enable member'}
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                onClick={handleDisable}
+                disabled={disabling}
+              >
+                {disabling ? 'Disabling...' : 'Disable member'}
+              </Button>
+            )
+          )}
+          {!isEditing && (
+            <Button
+              variant="destructive"
+              onClick={() => setDeleteDialogOpen(true)}
+              disabled={deleting}
+            >
+              {deleting ? 'Deleting...' : 'Delete member'}
+            </Button>
+          )}
         </div>
       </div>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete member?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete {member.name} and their profile, event
+              registrations, and related data. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleDelete();
+              }}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
         <DialogContent>

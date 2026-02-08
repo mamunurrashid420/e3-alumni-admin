@@ -185,6 +185,7 @@ export interface Member {
   member_id: string | null;
   membership_expires_at: string | null;
   email_verified_at: string | null;
+  disabled_at: string | null;
   created_at: string;
   updated_at: string;
   profile?: MemberProfile | null;

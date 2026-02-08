@@ -23,6 +23,9 @@ export const endpoints = {
   memberProfile: (id: number) => `${API_BASE}/members/${id}/profile`,
   resendSms: (id: number) => `${API_BASE}/members/${id}/resend-sms`,
   renewMembership: (id: number) => `${API_BASE}/members/${id}/renew-membership`,
+  disableMember: (id: number) => `${API_BASE}/members/${id}/disable`,
+  enableMember: (id: number) => `${API_BASE}/members/${id}/enable`,
+  deleteMember: (id: number) => `${API_BASE}/members/${id}`,
 
   // Payments
   payments: `${API_BASE}/payments`,

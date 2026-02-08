@@ -33,7 +33,7 @@ import { MEMBERSHIP_TYPE_LABELS } from '@/lib/constants';
 import { formatDate } from '@/lib/format';
 import { handleApiError } from '@/lib/errorHandler';
 import { toast } from 'sonner';
-import { Search, X, Download } from 'lucide-react';
+import { Search, X, Download, Pencil, UserMinus, UserCheck } from 'lucide-react';
 
 const EXPORT_PER_PAGE = 10000;
 const MEMBER_CSV_COLUMNS = [
@@ -125,6 +125,42 @@ export function MembersListPage() {
   }, []);
 
   const [exportLoading, setExportLoading] = useState(false);
+  const [togglingDisabledId, setTogglingDisabledId] = useState<number | null>(null);
+
+  const handleToggleDisabled = useCallback(
+    async (e: React.MouseEvent, member: Member) => {
+      e.stopPropagation();
+      const isDisabling = !member.disabled_at;
+      if (isDisabling && !confirm(`Disable ${member.name}? They will no longer be able to log in.`)) {
+        return;
+      }
+      setTogglingDisabledId(member.id);
+      try {
+        if (isDisabling) {
+          await apiClient.disableMember(member.id);
+          toast.success(`${member.name} disabled`);
+        } else {
+          await apiClient.enableMember(member.id);
+          toast.success(`${member.name} re-enabled`);
+        }
+        refetch();
+      } catch (err) {
+        toast.error(handleApiError(err));
+      } finally {
+        setTogglingDisabledId(null);
+      }
+    },
+    [refetch]
+  );
+
+  const handleEdit = useCallback(
+    (e: React.MouseEvent, id: number) => {
+      e.stopPropagation();
+      navigate(`/members/${id}`);
+    },
+    [navigate]
+  );
+
   const handleExportCsv = useCallback(async () => {
     setExportLoading(true);
     try {
@@ -252,11 +288,13 @@ export function MembersListPage() {
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Member ID</TableHead>
+                    <TableHead>Status</TableHead>
                     <TableHead>Primary Type</TableHead>
                     <TableHead>Expires</TableHead>
                     <TableHead>Secondary Type</TableHead>
                     <TableHead>Email Verified</TableHead>
                     <TableHead>Created</TableHead>
+                    <TableHead className="w-[120px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -274,6 +312,13 @@ export function MembersListPage() {
                           <Badge variant="outline">{member.member_id}</Badge>
                         ) : (
                           <span className="text-gray-400">N/A</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {member.disabled_at ? (
+                          <Badge variant="destructive">Disabled</Badge>
+                        ) : (
+                          <Badge variant="secondary">Active</Badge>
                         )}
                       </TableCell>
                       <TableCell>
@@ -311,6 +356,40 @@ export function MembersListPage() {
                         )}
                       </TableCell>
                       <TableCell>{formatDate(member.created_at)}</TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 gap-1"
+                            onClick={(e) => handleEdit(e, member.id)}
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                            Edit
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 gap-1"
+                            disabled={togglingDisabledId === member.id}
+                            onClick={(e) => handleToggleDisabled(e, member)}
+                          >
+                            {togglingDisabledId === member.id ? (
+                              <span className="animate-pulse">...</span>
+                            ) : member.disabled_at ? (
+                              <>
+                                <UserCheck className="w-3.5 h-3.5" />
+                                Enable
+                              </>
+                            ) : (
+                              <>
+                                <UserMinus className="w-3.5 h-3.5" />
+                                Disable
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

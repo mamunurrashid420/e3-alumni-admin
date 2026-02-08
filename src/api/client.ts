@@ -233,6 +233,29 @@ class ApiClient {
     return response.data;
   }
 
+  async disableMember(id: number): Promise<Member> {
+    const response = await this.client.post<{ data: Member }>(
+      endpoints.disableMember(id)
+    );
+    const body = response.data as { data?: Member };
+    return body.data ?? body as Member;
+  }
+
+  async enableMember(id: number): Promise<Member> {
+    const response = await this.client.post<{ data: Member }>(
+      endpoints.enableMember(id)
+    );
+    const body = response.data as { data?: Member };
+    return body.data ?? body as Member;
+  }
+
+  async deleteMember(id: number): Promise<{ message: string }> {
+    const response = await this.client.delete<{ message: string }>(
+      endpoints.deleteMember(id)
+    );
+    return response.data;
+  }
+
   async updateMemberProfile(
     id: number,
     data: {
