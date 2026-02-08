@@ -34,13 +34,16 @@ function toLocalDatetime(iso: string): string {
 export function CreateEventPage() {
   const navigate = useNavigate();
   const now = new Date();
-  const defaultStart = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-  const defaultEnd = new Date(defaultStart.getTime() + 3 * 60 * 60 * 1000);
+  const defaultEventAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  const defaultRegOpens = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  const defaultRegCloses = new Date(defaultEventAt.getTime() - 24 * 60 * 60 * 1000);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [shortDescription, setShortDescription] = useState('');
   const [location, setLocation] = useState('');
-  const [startAt, setStartAt] = useState(toLocalDatetime(defaultStart.toISOString()));
-  const [endAt, setEndAt] = useState(toLocalDatetime(defaultEnd.toISOString()));
+  const [eventAt, setEventAt] = useState(toLocalDatetime(defaultEventAt.toISOString()));
+  const [registrationOpensAt, setRegistrationOpensAt] = useState(toLocalDatetime(defaultRegOpens.toISOString()));
+  const [registrationClosesAt, setRegistrationClosesAt] = useState(toLocalDatetime(defaultRegCloses.toISOString()));
   const [status, setStatus] = useState<EventStatus>('draft');
   const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -49,14 +52,14 @@ export function CreateEventPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const start = new Date(startAt).toISOString();
-      const end = new Date(endAt).toISOString();
       await apiClient.createEvent({
         title,
         description: description || null,
+        short_description: shortDescription || null,
         location: location || null,
-        start_at: start,
-        end_at: end,
+        event_at: new Date(eventAt).toISOString(),
+        registration_opens_at: new Date(registrationOpensAt).toISOString(),
+        registration_closes_at: new Date(registrationClosesAt).toISOString(),
         status,
         cover_photo: coverPhoto,
       });
@@ -96,6 +99,19 @@ export function CreateEventPage() {
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="short_description">Short description</Label>
+              <Input
+                id="short_description"
+                value={shortDescription}
+                onChange={(e) => setShortDescription(e.target.value)}
+                placeholder="Brief summary for homepage banner (max 500 chars)"
+                maxLength={500}
+              />
+              <p className="text-xs text-muted-foreground">
+                Shown in the homepage Get Together banner
+              </p>
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
               <textarea
                 id="description"
@@ -103,7 +119,7 @@ export function CreateEventPage() {
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
                 className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                placeholder="Description"
+                placeholder="Full event description"
               />
             </div>
             <div className="space-y-2">
@@ -115,24 +131,34 @@ export function CreateEventPage() {
                 placeholder="Venue or address"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="start_at">Start date & time *</Label>
+                <Label htmlFor="event_at">Event date & time *</Label>
                 <Input
-                  id="start_at"
+                  id="event_at"
                   type="datetime-local"
-                  value={startAt}
-                  onChange={(e) => setStartAt(e.target.value)}
+                  value={eventAt}
+                  onChange={(e) => setEventAt(e.target.value)}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="end_at">End date & time *</Label>
+                <Label htmlFor="registration_opens_at">Registration opens *</Label>
                 <Input
-                  id="end_at"
+                  id="registration_opens_at"
                   type="datetime-local"
-                  value={endAt}
-                  onChange={(e) => setEndAt(e.target.value)}
+                  value={registrationOpensAt}
+                  onChange={(e) => setRegistrationOpensAt(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="registration_closes_at">Registration deadline *</Label>
+                <Input
+                  id="registration_closes_at"
+                  type="datetime-local"
+                  value={registrationClosesAt}
+                  onChange={(e) => setRegistrationClosesAt(e.target.value)}
                   required
                 />
               </div>

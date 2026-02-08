@@ -141,7 +141,8 @@ export function EventsListPage() {
                   <TableRow>
                     <TableHead className="w-12">#</TableHead>
                     <TableHead>Title</TableHead>
-                    <TableHead>Start</TableHead>
+                    <TableHead>Event date</TableHead>
+                    <TableHead>Reg. deadline</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Registrations</TableHead>
                     <TableHead className="w-[180px] text-right">Actions</TableHead>
@@ -152,7 +153,8 @@ export function EventsListPage() {
                     <TableRow key={event.id}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell className="font-medium">{event.title}</TableCell>
-                      <TableCell>{formatDateTime(event.start_at)}</TableCell>
+                      <TableCell>{formatDateTime(event.event_at)}</TableCell>
+                      <TableCell>{formatDateTime(event.registration_closes_at)}</TableCell>
                       <TableCell>
                         <span
                           className={

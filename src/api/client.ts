@@ -702,18 +702,22 @@ class ApiClient {
   async createEvent(data: {
     title: string;
     description?: string | null;
+    short_description?: string | null;
     location?: string | null;
-    start_at: string;
-    end_at: string;
+    event_at: string;
+    registration_opens_at: string;
+    registration_closes_at: string;
     status: EventStatus;
     cover_photo?: File | null;
   }): Promise<EventDetailResponse> {
     const form = new FormData();
     form.append('title', data.title);
     if (data.description != null) form.append('description', data.description);
+    if (data.short_description != null) form.append('short_description', data.short_description);
     if (data.location != null) form.append('location', data.location);
-    form.append('start_at', data.start_at);
-    form.append('end_at', data.end_at);
+    form.append('event_at', data.event_at);
+    form.append('registration_opens_at', data.registration_opens_at);
+    form.append('registration_closes_at', data.registration_closes_at);
     form.append('status', data.status);
     if (data.cover_photo) form.append('cover_photo', data.cover_photo);
     const response = await this.client.post<EventDetailResponse>(
@@ -728,9 +732,11 @@ class ApiClient {
     data: {
       title?: string;
       description?: string | null;
+      short_description?: string | null;
       location?: string | null;
-      start_at?: string;
-      end_at?: string;
+      event_at?: string;
+      registration_opens_at?: string;
+      registration_closes_at?: string;
       status?: EventStatus;
       cover_photo?: File | null;
       photos?: File[];
@@ -740,9 +746,11 @@ class ApiClient {
     form.append('_method', 'PUT');
     if (data.title != null) form.append('title', data.title);
     if (data.description != null) form.append('description', data.description);
+    if (data.short_description != null) form.append('short_description', data.short_description);
     if (data.location != null) form.append('location', data.location);
-    if (data.start_at != null) form.append('start_at', data.start_at);
-    if (data.end_at != null) form.append('end_at', data.end_at);
+    if (data.event_at != null) form.append('event_at', data.event_at);
+    if (data.registration_opens_at != null) form.append('registration_opens_at', data.registration_opens_at);
+    if (data.registration_closes_at != null) form.append('registration_closes_at', data.registration_closes_at);
     if (data.status != null) form.append('status', data.status);
     if (data.cover_photo) form.append('cover_photo', data.cover_photo);
     if (data.photos?.length) {
@@ -757,6 +765,10 @@ class ApiClient {
 
   async deleteEvent(id: number): Promise<void> {
     await this.client.delete(endpoints.event(id));
+  }
+
+  async deleteEventPhoto(eventId: number, photoId: number): Promise<void> {
+    await this.client.delete(endpoints.eventPhoto(eventId, photoId));
   }
 
   async getEventRegistrations(id: number): Promise<EventRegistrationsResponse> {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEvent } from '@/hooks/useEvent';
 import { apiClient } from '@/api/client';
@@ -30,7 +30,7 @@ import {
 } from '@/components/ui/select';
 import { handleApiError } from '@/lib/errorHandler';
 import { toast } from 'sonner';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Trash2 } from 'lucide-react';
 
 const STATUS_OPTIONS: EventStatus[] = ['draft', 'open', 'closed'];
 
@@ -48,9 +48,11 @@ export function EditEventPage() {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [shortDescription, setShortDescription] = useState('');
   const [location, setLocation] = useState('');
-  const [startAt, setStartAt] = useState('');
-  const [endAt, setEndAt] = useState('');
+  const [eventAt, setEventAt] = useState('');
+  const [registrationOpensAt, setRegistrationOpensAt] = useState('');
+  const [registrationClosesAt, setRegistrationClosesAt] = useState('');
   const [status, setStatus] = useState<EventStatus>('draft');
   const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
   const [coverPhotoPreview, setCoverPhotoPreview] = useState<string | null>(null);
@@ -58,14 +60,20 @@ export function EditEventPage() {
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
   const [closePhotos, setClosePhotos] = useState<File[]>([]);
   const [closeSubmitting, setCloseSubmitting] = useState(false);
+  const [galleryNewPhotos, setGalleryNewPhotos] = useState<File[]>([]);
+  const [gallerySubmitting, setGallerySubmitting] = useState(false);
+  const [deletingPhotoId, setDeletingPhotoId] = useState<number | null>(null);
+  const galleryFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (event) {
       setTitle(event.title);
       setDescription(event.description ?? '');
+      setShortDescription(event.short_description ?? '');
       setLocation(event.location ?? '');
-      setStartAt(toLocalDatetime(event.start_at));
-      setEndAt(toLocalDatetime(event.end_at));
+      setEventAt(toLocalDatetime(event.event_at));
+      setRegistrationOpensAt(toLocalDatetime(event.registration_opens_at));
+      setRegistrationClosesAt(toLocalDatetime(event.registration_closes_at));
       setStatus(event.status);
     }
   }, [event]);
@@ -88,14 +96,14 @@ export function EditEventPage() {
     if (eventId == null) return;
     setSubmitting(true);
     try {
-      const start = new Date(startAt).toISOString();
-      const end = new Date(endAt).toISOString();
       await apiClient.updateEvent(eventId, {
         title,
         description: description || null,
+        short_description: shortDescription || null,
         location: location || null,
-        start_at: start,
-        end_at: end,
+        event_at: new Date(eventAt).toISOString(),
+        registration_opens_at: new Date(registrationOpensAt).toISOString(),
+        registration_closes_at: new Date(registrationClosesAt).toISOString(),
         status,
         cover_photo: coverPhoto ?? undefined,
       });
@@ -124,6 +132,36 @@ export function EditEventPage() {
       toast.error(handleApiError(err));
     } finally {
       setCloseSubmitting(false);
+    }
+  };
+
+  const handleDeletePhoto = async (photoId: number) => {
+    if (eventId == null) return;
+    setDeletingPhotoId(photoId);
+    try {
+      await apiClient.deleteEventPhoto(eventId, photoId);
+      toast.success('Photo removed');
+      refetchEvent();
+    } catch (err) {
+      toast.error(handleApiError(err));
+    } finally {
+      setDeletingPhotoId(null);
+    }
+  };
+
+  const handleAddGalleryPhotos = async () => {
+    if (eventId == null || galleryNewPhotos.length === 0) return;
+    setGallerySubmitting(true);
+    try {
+      await apiClient.updateEvent(eventId, { photos: galleryNewPhotos });
+      toast.success('Photos added');
+      setGalleryNewPhotos([]);
+      galleryFileInputRef.current && (galleryFileInputRef.current.value = '');
+      refetchEvent();
+    } catch (err) {
+      toast.error(handleApiError(err));
+    } finally {
+      setGallerySubmitting(false);
     }
   };
 
@@ -217,6 +255,19 @@ export function EditEventPage() {
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="short_description">Short description</Label>
+              <Input
+                id="short_description"
+                value={shortDescription}
+                onChange={(e) => setShortDescription(e.target.value)}
+                placeholder="Brief summary for homepage banner (max 500 chars)"
+                maxLength={500}
+              />
+              <p className="text-xs text-muted-foreground">
+                Shown in the homepage Get Together banner
+              </p>
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
               <textarea
                 id="description"
@@ -224,7 +275,7 @@ export function EditEventPage() {
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
                 className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                placeholder="Description"
+                placeholder="Full event description"
               />
             </div>
             <div className="space-y-2">
@@ -236,24 +287,34 @@ export function EditEventPage() {
                 placeholder="Venue or address"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="start_at">Start date & time *</Label>
+                <Label htmlFor="event_at">Event date & time *</Label>
                 <Input
-                  id="start_at"
+                  id="event_at"
                   type="datetime-local"
-                  value={startAt}
-                  onChange={(e) => setStartAt(e.target.value)}
+                  value={eventAt}
+                  onChange={(e) => setEventAt(e.target.value)}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="end_at">End date & time *</Label>
+                <Label htmlFor="registration_opens_at">Registration opens *</Label>
                 <Input
-                  id="end_at"
+                  id="registration_opens_at"
                   type="datetime-local"
-                  value={endAt}
-                  onChange={(e) => setEndAt(e.target.value)}
+                  value={registrationOpensAt}
+                  onChange={(e) => setRegistrationOpensAt(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="registration_closes_at">Registration deadline *</Label>
+                <Input
+                  id="registration_closes_at"
+                  type="datetime-local"
+                  value={registrationClosesAt}
+                  onChange={(e) => setRegistrationClosesAt(e.target.value)}
                   required
                 />
               </div>
@@ -320,6 +381,62 @@ export function EditEventPage() {
           </form>
         </CardContent>
       </Card>
+
+      {event.status === 'closed' && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Event gallery</CardTitle>
+            <CardDescription>
+              Add or remove photos from the event gallery
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {event.photos && event.photos.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {event.photos.map((photo) => (
+                  <div
+                    key={photo.id}
+                    className="relative group rounded-lg overflow-hidden border"
+                  >
+                    <img
+                      src={photo.url}
+                      alt=""
+                      className="w-full h-40 object-cover"
+                    />
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8"
+                      onClick={() => handleDeletePhoto(photo.id)}
+                      disabled={deletingPhotoId === photo.id}
+                      title="Remove photo"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Input
+                ref={galleryFileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/jpg"
+                multiple
+                onChange={(e) =>
+                  setGalleryNewPhotos(Array.from(e.target.files ?? []))
+                }
+              />
+              <Button
+                onClick={handleAddGalleryPhotos}
+                disabled={galleryNewPhotos.length === 0 || gallerySubmitting}
+              >
+                {gallerySubmitting ? 'Adding...' : 'Add photos'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Dialog open={closeDialogOpen} onOpenChange={setCloseDialogOpen}>
         <DialogContent>

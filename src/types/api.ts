@@ -394,9 +394,11 @@ export interface Event {
   id: number;
   title: string;
   description: string | null;
+  short_description: string | null;
   location: string | null;
-  start_at: string;
-  end_at: string;
+  event_at: string;
+  registration_opens_at: string;
+  registration_closes_at: string;
   status: EventStatus;
   cover_photo: string | null;
   photos?: EventPhoto[];

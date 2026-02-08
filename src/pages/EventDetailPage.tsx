@@ -110,7 +110,7 @@ export function EventDetailPage() {
           <div className="flex flex-wrap gap-4 text-sm text-gray-600">
             <span className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
-              {formatDateTime(event.start_at)} – {formatDateTime(event.end_at)}
+              {formatDateTime(event.event_at)} · Reg: {formatDateTime(event.registration_opens_at)} – {formatDateTime(event.registration_closes_at)}
             </span>
             {event.location && (
               <span className="flex items-center gap-2">
