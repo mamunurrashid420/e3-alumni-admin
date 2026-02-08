@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEvent } from '@/hooks/useEvent';
 import { Button } from '@/components/ui/button';
@@ -18,12 +19,16 @@ import {
 } from '@/components/ui/table';
 import { formatDateTime } from '@/lib/format';
 import { Calendar, MapPin, Pencil, ArrowLeft } from 'lucide-react';
+import { PhotoViewer } from '@/components/PhotoViewer';
 
 export function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const eventId = id ? parseInt(id, 10) : null;
   const { event, registrations, loading, error, refetchEvent } = useEvent(eventId);
+  const [photoViewerOpen, setPhotoViewerOpen] = useState(false);
+  const [photoViewerSrc, setPhotoViewerSrc] = useState<string | null>(null);
+  const [photoViewerAlt, setPhotoViewerAlt] = useState('');
 
   if (eventId == null || Number.isNaN(eventId)) {
     return (
@@ -101,12 +106,28 @@ export function EventDetailPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {event.cover_photo && (
-            <img
-              src={event.cover_photo}
-              alt={event.title}
-              className="w-full max-w-md h-48 object-cover rounded-lg"
-            />
+            <button
+              type="button"
+              onClick={() => {
+                setPhotoViewerSrc(event.cover_photo ?? null);
+                setPhotoViewerAlt(event.title);
+                setPhotoViewerOpen(true);
+              }}
+              className="block w-full max-w-md rounded-lg overflow-hidden text-left"
+            >
+              <img
+                src={event.cover_photo}
+                alt={event.title}
+                className="w-full max-w-md h-48 object-cover rounded-lg cursor-pointer hover:opacity-95"
+              />
+            </button>
           )}
+          <PhotoViewer
+            open={photoViewerOpen}
+            onOpenChange={setPhotoViewerOpen}
+            src={photoViewerSrc}
+            alt={photoViewerAlt}
+          />
           <div className="flex flex-wrap gap-4 text-sm text-gray-600">
             <span className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
@@ -142,12 +163,22 @@ export function EventDetailPage() {
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {event.photos.map((photo) => (
-                <img
+                <button
                   key={photo.id}
-                  src={photo.url}
-                  alt=""
-                  className="w-full h-40 object-cover rounded-lg"
-                />
+                  type="button"
+                  onClick={() => {
+                    setPhotoViewerSrc(photo.url);
+                    setPhotoViewerAlt('');
+                    setPhotoViewerOpen(true);
+                  }}
+                  className="w-full rounded-lg overflow-hidden text-left"
+                >
+                  <img
+                    src={photo.url}
+                    alt=""
+                    className="w-full h-40 object-cover rounded-lg cursor-pointer hover:opacity-95"
+                  />
+                </button>
               ))}
             </div>
           </CardContent>

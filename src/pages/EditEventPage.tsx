@@ -31,6 +31,7 @@ import {
 import { handleApiError } from '@/lib/errorHandler';
 import { toast } from 'sonner';
 import { ArrowLeft, Trash2 } from 'lucide-react';
+import { PhotoViewer } from '@/components/PhotoViewer';
 
 const STATUS_OPTIONS: EventStatus[] = ['draft', 'open', 'closed'];
 
@@ -64,6 +65,9 @@ export function EditEventPage() {
   const [gallerySubmitting, setGallerySubmitting] = useState(false);
   const [deletingPhotoId, setDeletingPhotoId] = useState<number | null>(null);
   const galleryFileInputRef = useRef<HTMLInputElement>(null);
+  const [photoViewerOpen, setPhotoViewerOpen] = useState(false);
+  const [photoViewerSrc, setPhotoViewerSrc] = useState<string | null>(null);
+  const [photoViewerAlt, setPhotoViewerAlt] = useState('');
 
   useEffect(() => {
     if (event) {
@@ -345,11 +349,21 @@ export function EditEventPage() {
               {event.cover_photo && !coverPhoto && (
                 <div className="mt-2">
                   <p className="text-xs text-gray-500 mb-2">Current cover photo:</p>
-                  <img
-                    src={event.cover_photo}
-                    alt={event.title}
-                    className="w-full max-w-md h-48 object-cover rounded-lg border"
-                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPhotoViewerSrc(event.cover_photo ?? null);
+                      setPhotoViewerAlt(event.title);
+                      setPhotoViewerOpen(true);
+                    }}
+                    className="block w-full max-w-md rounded-lg overflow-hidden text-left border"
+                  >
+                    <img
+                      src={event.cover_photo}
+                      alt={event.title}
+                      className="w-full max-w-md h-48 object-cover rounded-lg cursor-pointer hover:opacity-95"
+                    />
+                  </button>
                 </div>
               )}
               {coverPhotoPreview && (
@@ -398,11 +412,21 @@ export function EditEventPage() {
                     key={photo.id}
                     className="relative group rounded-lg overflow-hidden border"
                   >
-                    <img
-                      src={photo.url}
-                      alt=""
-                      className="w-full h-40 object-cover"
-                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPhotoViewerSrc(photo.url);
+                        setPhotoViewerAlt('');
+                        setPhotoViewerOpen(true);
+                      }}
+                      className="block w-full text-left"
+                    >
+                      <img
+                        src={photo.url}
+                        alt=""
+                        className="w-full h-40 object-cover cursor-pointer hover:opacity-95"
+                      />
+                    </button>
                     <Button
                       variant="destructive"
                       size="icon"
@@ -437,6 +461,13 @@ export function EditEventPage() {
           </CardContent>
         </Card>
       )}
+
+      <PhotoViewer
+        open={photoViewerOpen}
+        onOpenChange={setPhotoViewerOpen}
+        src={photoViewerSrc}
+        alt={photoViewerAlt}
+      />
 
       <Dialog open={closeDialogOpen} onOpenChange={setCloseDialogOpen}>
         <DialogContent>
