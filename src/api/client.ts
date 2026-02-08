@@ -184,13 +184,17 @@ class ApiClient {
     search?: string,
     primaryMemberType?: MembershipType,
     page: number = 1,
-    perPage?: number
+    perPage?: number,
+    bloodDonors?: boolean,
+    bloodGroup?: string
   ): Promise<PaginatedResponse<Member>> {
     const params: Record<string, string> = {};
     if (search) params.search = search;
     if (primaryMemberType) params.primary_member_type = primaryMemberType;
     if (page > 1) params.page = page.toString();
     if (perPage != null) params.per_page = perPage.toString();
+    if (bloodDonors) params.blood_donors = '1';
+    if (bloodGroup) params.blood_group = bloodGroup;
     const response = await this.client.get<PaginatedResponse<Member>>(
       endpoints.members,
       { params }

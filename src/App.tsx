@@ -12,6 +12,7 @@ import { SelfDeclarationsListPage } from '@/pages/SelfDeclarationsListPage';
 import { SelfDeclarationDetailPage } from '@/pages/SelfDeclarationDetailPage';
 import { MembersListPage } from '@/pages/MembersListPage';
 import { MemberDetailPage } from '@/pages/MemberDetailPage';
+import { BloodDonorsListPage } from '@/pages/BloodDonorsListPage';
 import { PaymentsListPage } from '@/pages/PaymentsListPage';
 import { PaymentDetailPage } from '@/pages/PaymentDetailPage';
 import { ConveningCommitteeListPage } from '@/pages/ConveningCommitteeListPage';
@@ -58,6 +59,7 @@ function App() {
             <Route path="self-declarations/:id" element={<SelfDeclarationDetailPage />} />
             <Route path="members" element={<MembersListPage />} />
             <Route path="members/:id" element={<MemberDetailPage />} />
+            <Route path="blood-donors" element={<BloodDonorsListPage />} />
             <Route path="payments" element={<PaymentsListPage />} />
             <Route path="payments/:id" element={<PaymentDetailPage />} />
             <Route path="scholarships" element={<ScholarshipsListPage />} />

@@ -13,6 +13,7 @@ import {
   Calendar,
   GraduationCap,
   BookOpen,
+  Droplets,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -67,6 +68,14 @@ function SidebarNav({ onLinkClick }: { onLinkClick?: () => void }) {
       >
         <Users className="w-5 h-5" />
         <span>Members</span>
+      </NavLink>
+      <NavLink
+        to="/blood-donors"
+        className={linkClass}
+        onClick={onLinkClick}
+      >
+        <Droplets className="w-5 h-5" />
+        <span>Blood Donors</span>
       </NavLink>
       <NavLink
         to="/payments"
