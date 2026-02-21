@@ -298,6 +298,7 @@ export interface ScholarshipApplication {
   academic_proof_file: string | null;
   other_document_file: string | null;
   statement: string | null;
+  applicant_signature: string | null;
   user_id: number | null;
   status: ScholarshipApplicationStatus;
   approved_by: number | null;

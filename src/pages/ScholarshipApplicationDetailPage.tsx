@@ -272,6 +272,19 @@ export function ScholarshipApplicationDetailPage() {
                 </a>
               </div>
             )}
+            {application.applicant_signature && (
+              <div>
+                <p className="text-sm font-medium text-gray-500">Applicant signature</p>
+                <a
+                  href={application.applicant_signature}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  View file
+                </a>
+              </div>
+            )}
             {application.status === 'REJECTED' && application.rejected_reason && (
               <div>
                 <p className="text-sm font-medium text-gray-500">Rejection reason</p>
