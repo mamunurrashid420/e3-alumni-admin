@@ -55,6 +55,7 @@ export function EditEventPage() {
   const [registrationOpensAt, setRegistrationOpensAt] = useState('');
   const [registrationClosesAt, setRegistrationClosesAt] = useState('');
   const [status, setStatus] = useState<EventStatus>('draft');
+  const [fee, setFee] = useState<string>('');
   const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
   const [coverPhotoPreview, setCoverPhotoPreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -79,6 +80,7 @@ export function EditEventPage() {
       setRegistrationOpensAt(toLocalDatetime(event.registration_opens_at));
       setRegistrationClosesAt(toLocalDatetime(event.registration_closes_at));
       setStatus(event.status);
+      setFee(event.fee != null ? String(event.fee) : '');
     }
   }, [event]);
 
@@ -110,6 +112,7 @@ export function EditEventPage() {
         registration_closes_at: new Date(registrationClosesAt).toISOString(),
         status,
         cover_photo: coverPhoto ?? undefined,
+        fee: fee === '' ? null : Number(fee),
       });
       toast.success('Event updated');
       refetchEvent();
@@ -337,6 +340,21 @@ export function EditEventPage() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="fee">Event fee (per person)</Label>
+              <Input
+                id="fee"
+                type="number"
+                min={0}
+                step={0.01}
+                value={fee}
+                onChange={(e) => setFee(e.target.value)}
+                placeholder="Optional — same for participant and each guest"
+              />
+              <p className="text-xs text-muted-foreground">
+                Fee per participant and per guest. Total fees = fee × (1 + number of guests).
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="cover_photo">Cover photo</Label>

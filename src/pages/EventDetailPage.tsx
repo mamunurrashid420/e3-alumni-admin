@@ -203,8 +203,12 @@ export function EventDetailPage() {
                     <TableHead>Email</TableHead>
                     <TableHead>Phone</TableHead>
                     <TableHead>Address</TableHead>
-                    <TableHead>SSC / JSC</TableHead>
+                    <TableHead>SSC Batch</TableHead>
                     <TableHead className="text-right">Guests</TableHead>
+                    <TableHead>Guest details</TableHead>
+                    <TableHead className="text-right">Fee</TableHead>
+                    <TableHead className="text-right">Total fees</TableHead>
+                    <TableHead>Payment</TableHead>
                     <TableHead>Notes</TableHead>
                     <TableHead>Registered at</TableHead>
                   </TableRow>
@@ -221,6 +225,29 @@ export function EventDetailPage() {
                       </TableCell>
                       <TableCell>{reg.ssc_jsc ?? '—'}</TableCell>
                       <TableCell className="text-right">{reg.guest_count ?? 0}</TableCell>
+                      <TableCell className="max-w-[140px] truncate" title={reg.guest_details ?? undefined}>
+                        {reg.guest_details ?? '—'}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {reg.participant_fee != null ? reg.participant_fee : '—'}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {reg.total_fees != null ? reg.total_fees : '—'}
+                      </TableCell>
+                      <TableCell>
+                        {reg.payment_document_url ? (
+                          <a
+                            href={reg.payment_document_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline"
+                          >
+                            View
+                          </a>
+                        ) : (
+                          '—'
+                        )}
+                      </TableCell>
                       <TableCell className="max-w-[200px] truncate" title={reg.notes ?? undefined}>
                         {reg.notes ?? '—'}
                       </TableCell>

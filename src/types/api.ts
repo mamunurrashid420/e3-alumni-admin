@@ -403,6 +403,7 @@ export interface Event {
   registration_closes_at: string;
   status: EventStatus;
   cover_photo: string | null;
+  fee: number | null;
   photos?: EventPhoto[];
   registration_count?: number;
   is_registered?: boolean;
@@ -429,6 +430,10 @@ export interface EventRegistration {
   registered_at: string;
   notes: string | null;
   guest_count: number;
+  guest_details: string | null;
+  participant_fee: number | null;
+  total_fees: number | null;
+  payment_document_url: string | null;
   user: {
     id: number;
     name: string;

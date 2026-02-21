@@ -748,6 +748,7 @@ class ApiClient {
     registration_closes_at: string;
     status: EventStatus;
     cover_photo?: File | null;
+    fee?: number | null;
   }): Promise<EventDetailResponse> {
     const form = new FormData();
     form.append('title', data.title);
@@ -759,6 +760,7 @@ class ApiClient {
     form.append('registration_closes_at', data.registration_closes_at);
     form.append('status', data.status);
     if (data.cover_photo) form.append('cover_photo', data.cover_photo);
+    if (data.fee != null) form.append('fee', String(data.fee));
     const response = await this.client.post<EventDetailResponse>(
       endpoints.events,
       form
@@ -778,6 +780,7 @@ class ApiClient {
       registration_closes_at?: string;
       status?: EventStatus;
       cover_photo?: File | null;
+      fee?: number | null;
       photos?: File[];
     }
   ): Promise<EventDetailResponse> {
@@ -792,6 +795,7 @@ class ApiClient {
     if (data.registration_closes_at != null) form.append('registration_closes_at', data.registration_closes_at);
     if (data.status != null) form.append('status', data.status);
     if (data.cover_photo) form.append('cover_photo', data.cover_photo);
+    if (data.fee !== undefined) form.append('fee', data.fee === null || data.fee === '' ? '' : String(data.fee));
     if (data.photos?.length) {
       data.photos.forEach((file) => form.append('photos[]', file));
     }
