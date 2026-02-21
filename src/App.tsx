@@ -21,6 +21,7 @@ import { HonorBoardListPage } from '@/pages/HonorBoardListPage';
 import { BatchRepresentativesListPage } from '@/pages/BatchRepresentativesListPage';
 import { DownloadsListPage } from '@/pages/DownloadsListPage';
 import { GalleryListPage } from '@/pages/GalleryListPage';
+import { NoticesListPage } from '@/pages/NoticesListPage';
 import { NewsListPage } from '@/pages/NewsListPage';
 import { JobsListPage } from '@/pages/JobsListPage';
 import { EventsListPage } from '@/pages/EventsListPage';
@@ -70,6 +71,7 @@ function App() {
             <Route path="scholarship-applications/:id" element={<ScholarshipApplicationDetailPage />} />
             <Route path="downloads" element={<DownloadsListPage />} />
             <Route path="gallery" element={<GalleryListPage />} />
+            <Route path="notices" element={<NoticesListPage />} />
             <Route path="news" element={<NewsListPage />} />
             <Route path="jobs" element={<JobsListPage />} />
             <Route path="events" element={<EventsListPage />} />

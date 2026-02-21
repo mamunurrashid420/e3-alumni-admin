@@ -15,6 +15,7 @@ import {
   BookOpen,
   Droplets,
   ImageIcon,
+  Megaphone,
   Newspaper,
   Briefcase,
 } from 'lucide-react';
@@ -121,6 +122,14 @@ function SidebarNav({ onLinkClick }: { onLinkClick?: () => void }) {
         <span>Gallery</span>
       </NavLink>
       <NavLink
+        to="/notices"
+        className={linkClass}
+        onClick={onLinkClick}
+      >
+        <Megaphone className="w-5 h-5" />
+        <span>Notices</span>
+      </NavLink>
+      <NavLink
         to="/news"
         className={linkClass}
         onClick={onLinkClick}
@@ -190,8 +199,10 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
   return (
     <>
       {/* Desktop sidebar - fixed, only visible on lg+ */}
-      <aside className="hidden lg:block w-64 bg-white border-r h-[calc(100vh-4rem)] fixed left-0 top-16">
-        <SidebarNav />
+      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:bg-white lg:border-r lg:h-[calc(100vh-4rem)] lg:fixed lg:left-0 lg:top-16 lg:overflow-hidden">
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          <SidebarNav />
+        </div>
       </aside>
 
       {/* Mobile sidebar - Sheet, only visible below lg */}

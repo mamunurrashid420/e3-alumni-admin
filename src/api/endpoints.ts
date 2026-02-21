@@ -79,6 +79,8 @@ export const endpoints = {
   // Homepage content
   galleryPhotos: `${API_BASE}/gallery-photos`,
   galleryPhoto: (id: number) => `${API_BASE}/gallery-photos/${id}`,
+  notices: `${API_BASE}/notices`,
+  notice: (id: number) => `${API_BASE}/notices/${id}`,
   news: `${API_BASE}/news`,
   newsItem: (id: number) => `${API_BASE}/news/${id}`,
   jobs: `${API_BASE}/jobs`,

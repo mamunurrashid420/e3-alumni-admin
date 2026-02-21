@@ -43,6 +43,7 @@ import type {
   ApproveScholarshipApplicationResponse,
   RejectScholarshipApplicationResponse,
   GalleryPhoto,
+  NoticeItem,
   NewsItem,
   JobListing,
 } from '@/types/api';
@@ -867,6 +868,59 @@ class ApiClient {
 
   async deleteGalleryPhoto(id: number): Promise<void> {
     await this.client.delete(endpoints.galleryPhoto(id));
+  }
+
+  // Notices (scrolling bar; super_admin sees all)
+  async getNotices(): Promise<AboutListResponse<NoticeItem>> {
+    const response = await this.client.get<AboutListResponse<NoticeItem>>(
+      endpoints.notices
+    );
+    return response.data;
+  }
+
+  async getNotice(id: number): Promise<{ data: NoticeItem }> {
+    const response = await this.client.get<{ data: NoticeItem }>(
+      endpoints.notice(id)
+    );
+    return response.data;
+  }
+
+  async createNotice(data: {
+    title: string;
+    body?: string | null;
+    is_active?: boolean;
+    sort_order?: number;
+  }): Promise<{ data: NoticeItem }> {
+    const response = await this.client.post<{ data: NoticeItem }>(
+      endpoints.notices,
+      {
+        title: data.title,
+        body: data.body ?? null,
+        is_active: data.is_active ?? true,
+        sort_order: data.sort_order ?? 0,
+      }
+    );
+    return response.data;
+  }
+
+  async updateNotice(
+    id: number,
+    data: Partial<{
+      title: string;
+      body: string | null;
+      is_active: boolean;
+      sort_order: number;
+    }>
+  ): Promise<{ data: NoticeItem }> {
+    const response = await this.client.put<{ data: NoticeItem }>(
+      endpoints.notice(id),
+      data
+    );
+    return response.data;
+  }
+
+  async deleteNotice(id: number): Promise<void> {
+    await this.client.delete(endpoints.notice(id));
   }
 
   // News
