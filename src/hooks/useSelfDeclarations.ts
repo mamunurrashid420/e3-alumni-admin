@@ -8,7 +8,7 @@ import type {
 import { handleApiError } from '@/lib/errorHandler';
 import { toast } from 'sonner';
 
-export function useSelfDeclarations(statusFilter?: SelfDeclarationStatus) {
+export function useSelfDeclarations(statusFilter?: SelfDeclarationStatus, page: number = 1) {
   const [selfDeclarations, setSelfDeclarations] = useState<SelfDeclaration[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +18,7 @@ export function useSelfDeclarations(statusFilter?: SelfDeclarationStatus) {
     try {
       setLoading(true);
       setError(null);
-      const response = await apiClient.getSelfDeclarations(statusFilter);
+      const response = await apiClient.getSelfDeclarations(statusFilter, undefined, page);
       setSelfDeclarations(response.data);
       setPagination(response.meta);
     } catch (err) {
@@ -32,7 +32,7 @@ export function useSelfDeclarations(statusFilter?: SelfDeclarationStatus) {
 
   useEffect(() => {
     fetchSelfDeclarations();
-  }, [statusFilter]);
+  }, [statusFilter, page]);
 
   return {
     selfDeclarations,

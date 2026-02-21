@@ -30,6 +30,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Pagination } from '@/components/ui/pagination';
 import { handleApiError } from '@/lib/errorHandler';
 import { toast } from 'sonner';
 import { Download } from 'lucide-react';
@@ -58,13 +59,14 @@ export function ScholarshipApplicationsListPage() {
   const [statusFilter, setStatusFilter] = useState<
     ScholarshipApplicationStatus | undefined
   >('PENDING');
+  const [currentPage, setCurrentPage] = useState(1);
   const {
     applications,
     loading,
     error,
     pagination,
     refetch,
-  } = useScholarshipApplications(statusFilter);
+  } = useScholarshipApplications(statusFilter, undefined, currentPage);
   const [exportLoading, setExportLoading] = useState(false);
 
   const handleExportCsv = async () => {
@@ -163,11 +165,12 @@ export function ScholarshipApplicationsListPage() {
             <div className="w-full sm:w-48">
               <Select
                 value={statusFilter || 'all'}
-                onValueChange={(value) =>
+                onValueChange={(value) => {
                   setStatusFilter(
                     value === 'all' ? undefined : (value as ScholarshipApplicationStatus)
-                  )
-                }
+                  );
+                  setCurrentPage(1);
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Filter by status" />
@@ -231,6 +234,14 @@ export function ScholarshipApplicationsListPage() {
                   ))}
                 </TableBody>
               </Table>
+            </div>
+          )}
+          {pagination && pagination.last_page > 1 && (
+            <div className="mt-4">
+              <Pagination
+                pagination={pagination}
+                onPageChange={setCurrentPage}
+              />
             </div>
           )}
         </CardContent>

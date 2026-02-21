@@ -42,6 +42,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Pagination } from '@/components/ui/pagination';
 import { Download } from 'lucide-react';
 
 const EXPORT_PER_PAGE = 10000;
@@ -60,7 +61,11 @@ const PAYMENT_CSV_COLUMNS = [
 
 export function PaymentsListPage() {
   const [statusFilter, setStatusFilter] = useState<PaymentStatus | undefined>();
-  const { payments, loading, error, pagination, refetch } = usePayments(statusFilter);
+  const [currentPage, setCurrentPage] = useState(1);
+  const { payments, loading, error, pagination, refetch } = usePayments(
+    statusFilter,
+    currentPage
+  );
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [exportLoading, setExportLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -241,9 +246,10 @@ export function PaymentsListPage() {
             <div className="w-full sm:w-48">
               <Select
                 value={statusFilter || 'all'}
-                onValueChange={(value) =>
-                  setStatusFilter(value === 'all' ? undefined : (value as PaymentStatus))
-                }
+                onValueChange={(value) => {
+                  setStatusFilter(value === 'all' ? undefined : (value as PaymentStatus));
+                  setCurrentPage(1);
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Filter by status" />
@@ -332,34 +338,11 @@ export function PaymentsListPage() {
           )}
 
           {pagination && pagination.last_page > 1 && (
-            <div className="flex items-center justify-between mt-4">
-              <div className="text-sm text-gray-600">
-                Page {pagination.current_page} of {pagination.last_page}
-              </div>
-              <div className="flex gap-2">
-                {pagination.current_page > 1 && (
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      // TODO: Implement pagination navigation
-                      toast.info('Pagination navigation coming soon');
-                    }}
-                  >
-                    Previous
-                  </Button>
-                )}
-                {pagination.current_page < pagination.last_page && (
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      // TODO: Implement pagination navigation
-                      toast.info('Pagination navigation coming soon');
-                    }}
-                  >
-                    Next
-                  </Button>
-                )}
-              </div>
+            <div className="mt-4">
+              <Pagination
+                pagination={pagination}
+                onPageChange={setCurrentPage}
+              />
             </div>
           )}
         </CardContent>

@@ -29,6 +29,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Pagination } from '@/components/ui/pagination';
 import { MEMBERSHIP_TYPE_LABELS } from '@/lib/constants';
 import { formatDate } from '@/lib/format';
 import { handleApiError } from '@/lib/errorHandler';
@@ -398,30 +399,11 @@ export function MembersListPage() {
           )}
 
           {pagination && pagination.last_page > 1 && (
-            <div className="flex items-center justify-between mt-4">
-              <div className="text-sm text-gray-600">
-                Page {pagination.current_page} of {pagination.last_page}
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  disabled={pagination.current_page === 1}
-                  onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                >
-                  Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  disabled={pagination.current_page === pagination.last_page}
-                  onClick={() =>
-                    setCurrentPage((prev) =>
-                      Math.min(pagination.last_page, prev + 1)
-                    )
-                  }
-                >
-                  Next
-                </Button>
-              </div>
+            <div className="mt-4">
+              <Pagination
+                pagination={pagination}
+                onPageChange={setCurrentPage}
+              />
             </div>
           )}
         </CardContent>

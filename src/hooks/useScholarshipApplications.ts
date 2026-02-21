@@ -10,7 +10,8 @@ import { toast } from 'sonner';
 
 export function useScholarshipApplications(
   status?: ScholarshipApplicationStatus,
-  scholarshipId?: number
+  scholarshipId?: number,
+  page: number = 1
 ) {
   const [applications, setApplications] = useState<ScholarshipApplication[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +26,9 @@ export function useScholarshipApplications(
       setError(null);
       const response = await apiClient.getScholarshipApplications(
         status,
-        scholarshipId
+        scholarshipId,
+        undefined,
+        page
       );
       setApplications(response.data);
       setPagination(response.meta);
@@ -40,7 +43,7 @@ export function useScholarshipApplications(
 
   useEffect(() => {
     load();
-  }, [status, scholarshipId]);
+  }, [status, scholarshipId, page]);
 
   return {
     applications,

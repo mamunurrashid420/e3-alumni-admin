@@ -26,6 +26,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Pagination } from '@/components/ui/pagination';
 import { BLOOD_GROUPS } from '@/lib/constants';
 import { handleApiError } from '@/lib/errorHandler';
 import { Search, X, Droplets } from 'lucide-react';
@@ -190,28 +191,11 @@ export function BloodDonorsListPage() {
           )}
 
           {pagination && pagination.last_page > 1 && (
-            <div className="flex items-center justify-between mt-4">
-              <div className="text-sm text-gray-600">
-                Page {pagination.current_page} of {pagination.last_page}
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  disabled={pagination.current_page === 1}
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                >
-                  Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  disabled={pagination.current_page === pagination.last_page}
-                  onClick={() =>
-                    setCurrentPage((p) => Math.min(pagination.last_page, p + 1))
-                  }
-                >
-                  Next
-                </Button>
-              </div>
+            <div className="mt-4">
+              <Pagination
+                pagination={pagination}
+                onPageChange={setCurrentPage}
+              />
             </div>
           )}
         </CardContent>

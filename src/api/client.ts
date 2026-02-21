@@ -141,11 +141,13 @@ class ApiClient {
   // Membership Applications methods
   async getApplications(
     status?: ApplicationStatus,
-    perPage?: number
+    perPage?: number,
+    page?: number
   ): Promise<PaginatedResponse<MembershipApplication>> {
     const params: Record<string, string | number> = {};
     if (status) params.status = status;
     if (perPage != null) params.per_page = perPage;
+    if (page != null && page > 1) params.page = page;
     const response = await this.client.get<
       PaginatedResponse<MembershipApplication>
     >(endpoints.applications, { params });
@@ -289,10 +291,12 @@ class ApiClient {
   // Payment Management
   async getPayments(
     status?: PaymentStatus,
-    perPage?: number
+    perPage?: number,
+    page?: number
   ): Promise<PaginatedResponse<Payment>> {
     const params: Record<string, string | number> = status ? { status } : {};
     if (perPage != null) params.per_page = perPage;
+    if (page != null && page > 1) params.page = page;
     const response = await this.client.get<PaginatedResponse<Payment>>(
       endpoints.payments,
       { params }
@@ -342,10 +346,12 @@ class ApiClient {
   // Self Declaration Management
   async getSelfDeclarations(
     status?: SelfDeclarationStatus,
-    perPage?: number
+    perPage?: number,
+    page?: number
   ): Promise<PaginatedResponse<SelfDeclaration>> {
     const params: Record<string, string | number> = status ? { status } : {};
     if (perPage != null) params.per_page = perPage;
+    if (page != null && page > 1) params.page = page;
     const response = await this.client.get<PaginatedResponse<SelfDeclaration>>(
       endpoints.selfDeclarations,
       { params }
@@ -436,12 +442,14 @@ class ApiClient {
   async getScholarshipApplications(
     status?: ScholarshipApplicationStatus,
     scholarshipId?: number,
-    perPage?: number
+    perPage?: number,
+    page?: number
   ): Promise<PaginatedResponse<ScholarshipApplication>> {
     const params: Record<string, string | number> = {};
     if (status) params.status = status;
     if (scholarshipId) params.scholarship_id = scholarshipId;
     if (perPage != null) params.per_page = perPage;
+    if (page != null && page > 1) params.page = page;
     const response = await this.client.get<
       PaginatedResponse<ScholarshipApplication>
     >(endpoints.scholarshipApplications, { params });

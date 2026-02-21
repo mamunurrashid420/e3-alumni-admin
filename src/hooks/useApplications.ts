@@ -8,7 +8,7 @@ import type {
 import { handleApiError } from '@/lib/errorHandler';
 import { toast } from 'sonner';
 
-export function useApplications(status?: ApplicationStatus) {
+export function useApplications(status?: ApplicationStatus, page: number = 1) {
   const [applications, setApplications] = useState<MembershipApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +18,7 @@ export function useApplications(status?: ApplicationStatus) {
     try {
       setLoading(true);
       setError(null);
-      const response = await apiClient.getApplications(status);
+      const response = await apiClient.getApplications(status, undefined, page);
       setApplications(response.data);
       setPagination(response.meta);
     } catch (err) {
@@ -32,7 +32,7 @@ export function useApplications(status?: ApplicationStatus) {
 
   useEffect(() => {
     loadApplications();
-  }, [status]);
+  }, [status, page]);
 
   return {
     applications,

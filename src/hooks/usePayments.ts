@@ -8,7 +8,7 @@ import type {
 import { handleApiError } from '@/lib/errorHandler';
 import { toast } from 'sonner';
 
-export function usePayments(status?: PaymentStatus) {
+export function usePayments(status?: PaymentStatus, page: number = 1) {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +18,7 @@ export function usePayments(status?: PaymentStatus) {
     try {
       setLoading(true);
       setError(null);
-      const response = await apiClient.getPayments(status);
+      const response = await apiClient.getPayments(status, undefined, page);
       setPayments(response.data);
       setPagination(response.meta);
     } catch (err) {
@@ -32,7 +32,7 @@ export function usePayments(status?: PaymentStatus) {
 
   useEffect(() => {
     loadPayments();
-  }, [status]);
+  }, [status, page]);
 
   return {
     payments,

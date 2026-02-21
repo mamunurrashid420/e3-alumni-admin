@@ -31,6 +31,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Pagination } from '@/components/ui/pagination';
 import { STATUS_LABELS } from '@/lib/constants';
 import { formatDate } from '@/lib/format';
 import { handleApiError } from '@/lib/errorHandler';
@@ -56,7 +57,11 @@ import {
 
 export function ApplicationsListPage() {
   const [statusFilter, setStatusFilter] = useState<ApplicationStatus | undefined>('PENDING');
-  const { applications, loading, error, pagination, refetch } = useApplications(statusFilter);
+  const [currentPage, setCurrentPage] = useState(1);
+  const { applications, loading, error, pagination, refetch } = useApplications(
+    statusFilter,
+    currentPage
+  );
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [exportLoading, setExportLoading] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -230,9 +235,10 @@ export function ApplicationsListPage() {
             <div className="w-full sm:w-48">
               <Select
                 value={statusFilter || 'all'}
-                onValueChange={(value) =>
-                  setStatusFilter(value === 'all' ? undefined : (value as ApplicationStatus))
-                }
+                onValueChange={(value) => {
+                  setStatusFilter(value === 'all' ? undefined : (value as ApplicationStatus));
+                  setCurrentPage(1);
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Filter by status" />
@@ -317,34 +323,13 @@ export function ApplicationsListPage() {
           )}
 
           {pagination && pagination.last_page > 1 && (
-            <div className="flex items-center justify-between mt-4">
-              <div className="text-sm text-gray-600">
-                Page {pagination.current_page} of {pagination.last_page}
-              </div>
-              <div className="flex gap-2">
-                {pagination.current_page > 1 && (
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      // TODO: Implement pagination navigation
-                      toast.info('Pagination navigation coming soon');
-                    }}
-                  >
-                    Previous
-                  </Button>
-                )}
-                {pagination.current_page < pagination.last_page && (
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      // TODO: Implement pagination navigation
-                      toast.info('Pagination navigation coming soon');
-                    }}
-                  >
-                    Next
-                  </Button>
-                )}
-              </div>
+            <div className="mt-4">
+              <Pagination
+                pagination={pagination}
+                onPageChange={(page) => {
+                  setCurrentPage(page);
+                }}
+              />
             </div>
           )}
         </CardContent>
