@@ -169,8 +169,10 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
       {/* Mobile sidebar - Sheet, only visible below lg */}
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="left" className="w-64 p-0 lg:hidden">
-          <SidebarNav onLinkClick={handleLinkClick} />
+        <SheetContent side="left" className="w-64 p-0 lg:hidden flex flex-col overflow-hidden">
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            <SidebarNav onLinkClick={handleLinkClick} />
+          </div>
         </SheetContent>
       </Sheet>
     </>
