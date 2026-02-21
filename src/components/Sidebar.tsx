@@ -14,6 +14,9 @@ import {
   GraduationCap,
   BookOpen,
   Droplets,
+  ImageIcon,
+  Newspaper,
+  Briefcase,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -108,6 +111,30 @@ function SidebarNav({ onLinkClick }: { onLinkClick?: () => void }) {
       >
         <Download className="w-5 h-5" />
         <span>Downloads</span>
+      </NavLink>
+      <NavLink
+        to="/gallery"
+        className={linkClass}
+        onClick={onLinkClick}
+      >
+        <ImageIcon className="w-5 h-5" />
+        <span>Gallery</span>
+      </NavLink>
+      <NavLink
+        to="/news"
+        className={linkClass}
+        onClick={onLinkClick}
+      >
+        <Newspaper className="w-5 h-5" />
+        <span>News</span>
+      </NavLink>
+      <NavLink
+        to="/jobs"
+        className={linkClass}
+        onClick={onLinkClick}
+      >
+        <Briefcase className="w-5 h-5" />
+        <span>Jobs</span>
       </NavLink>
       <NavLink
         to="/events"

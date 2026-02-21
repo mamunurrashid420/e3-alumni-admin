@@ -42,6 +42,9 @@ import type {
   ScholarshipApplicationDetailResponse,
   ApproveScholarshipApplicationResponse,
   RejectScholarshipApplicationResponse,
+  GalleryPhoto,
+  NewsItem,
+  JobListing,
 } from '@/types/api';
 import { endpoints } from './endpoints';
 import { getCookie, setCookie, removeCookie } from '@/lib/cookie';
@@ -811,6 +814,221 @@ class ApiClient {
       endpoints.eventRegistrations(id)
     );
     return response.data;
+  }
+
+  // Gallery photos
+  async getGalleryPhotos(params?: { category?: string }): Promise<AboutListResponse<GalleryPhoto>> {
+    const response = await this.client.get<AboutListResponse<GalleryPhoto>>(
+      endpoints.galleryPhotos,
+      { params }
+    );
+    return response.data;
+  }
+
+  async getGalleryPhoto(id: number): Promise<{ data: GalleryPhoto }> {
+    const response = await this.client.get<{ data: GalleryPhoto }>(
+      endpoints.galleryPhoto(id)
+    );
+    return response.data;
+  }
+
+  async createGalleryPhoto(data: {
+    image: File;
+    category: string;
+    sort_order?: number;
+  }): Promise<{ data: GalleryPhoto }> {
+    const body = this.buildAboutFormData({
+      image: data.image,
+      category: data.category,
+      sort_order: data.sort_order ?? 0,
+    });
+    const response = await this.client.post<{ data: GalleryPhoto }>(
+      endpoints.galleryPhotos,
+      body
+    );
+    return response.data;
+  }
+
+  async updateGalleryPhoto(
+    id: number,
+    data: { image?: File | null; category?: string; sort_order?: number }
+  ): Promise<{ data: GalleryPhoto }> {
+    const body = this.buildAboutFormData({
+      image: data.image ?? undefined,
+      category: data.category,
+      sort_order: data.sort_order,
+    });
+    const response = await this.client.put<{ data: GalleryPhoto }>(
+      endpoints.galleryPhoto(id),
+      body
+    );
+    return response.data;
+  }
+
+  async deleteGalleryPhoto(id: number): Promise<void> {
+    await this.client.delete(endpoints.galleryPhoto(id));
+  }
+
+  // News
+  async getNews(perPage?: number): Promise<AboutListResponse<NewsItem>> {
+    const params = perPage != null ? { per_page: perPage } : {};
+    const response = await this.client.get<AboutListResponse<NewsItem>>(
+      endpoints.news,
+      { params }
+    );
+    return response.data;
+  }
+
+  async getNewsItem(id: number): Promise<{ data: NewsItem }> {
+    const response = await this.client.get<{ data: NewsItem }>(
+      endpoints.newsItem(id)
+    );
+    return response.data;
+  }
+
+  async createNews(data: {
+    slug?: string | null;
+    title: string;
+    description?: string | null;
+    body?: string | null;
+    image?: File | null;
+    author?: string | null;
+    published_at?: string | null;
+    is_published?: boolean;
+    sort_order?: number;
+  }): Promise<{ data: NewsItem }> {
+    const body = this.buildAboutFormData({
+      slug: data.slug ?? null,
+      title: data.title,
+      description: data.description ?? null,
+      body: data.body ?? null,
+      image: data.image ?? undefined,
+      author: data.author ?? null,
+      published_at: data.published_at ?? null,
+      is_published: data.is_published === true ? 1 : 0,
+      sort_order: data.sort_order ?? 0,
+    });
+    const response = await this.client.post<{ data: NewsItem }>(
+      endpoints.news,
+      body
+    );
+    return response.data;
+  }
+
+  async updateNews(
+    id: number,
+    data: Partial<{
+      slug: string | null;
+      title: string;
+      description: string | null;
+      body: string | null;
+      image: File | null;
+      author: string | null;
+      published_at: string | null;
+      is_published: boolean;
+      sort_order: number;
+    }>
+  ): Promise<{ data: NewsItem }> {
+    const body = this.buildAboutFormData({
+      slug: data.slug,
+      title: data.title,
+      description: data.description,
+      body: data.body,
+      image: data.image ?? undefined,
+      author: data.author,
+      published_at: data.published_at,
+      is_published: data.is_published === true ? 1 : data.is_published === false ? 0 : undefined,
+      sort_order: data.sort_order,
+    });
+    const response = await this.client.put<{ data: NewsItem }>(
+      endpoints.newsItem(id),
+      body
+    );
+    return response.data;
+  }
+
+  async deleteNews(id: number): Promise<void> {
+    await this.client.delete(endpoints.newsItem(id));
+  }
+
+  // Jobs
+  async getJobs(params?: { status?: string }): Promise<AboutListResponse<JobListing>> {
+    const response = await this.client.get<AboutListResponse<JobListing>>(
+      endpoints.jobs,
+      { params }
+    );
+    return response.data;
+  }
+
+  async getJob(id: number): Promise<{ data: JobListing }> {
+    const response = await this.client.get<{ data: JobListing }>(
+      endpoints.job(id)
+    );
+    return response.data;
+  }
+
+  async createJob(data: {
+    title: string;
+    description?: string | null;
+    company_name?: string | null;
+    logo?: File | null;
+    status?: 'active' | 'expired';
+    application_url?: string | null;
+    closes_at?: string | null;
+    sort_order?: number;
+  }): Promise<{ data: JobListing }> {
+    const body = this.buildAboutFormData({
+      title: data.title,
+      description: data.description ?? null,
+      company_name: data.company_name ?? null,
+      logo: data.logo ?? undefined,
+      status: data.status ?? 'active',
+      application_url: data.application_url ?? null,
+      closes_at: data.closes_at ?? null,
+      sort_order: data.sort_order ?? 0,
+    });
+    const response = await this.client.post<{ data: JobListing }>(
+      endpoints.jobs,
+      body
+    );
+    return response.data;
+  }
+
+  async updateJob(
+    id: number,
+    data: Partial<{
+      title: string;
+      description: string | null;
+      company_name: string | null;
+      logo: File | null;
+      status: 'active' | 'expired';
+      application_url: string | null;
+      closes_at: string | null;
+      sort_order: number;
+    }>
+  ): Promise<{ data: JobListing }> {
+    const body = this.buildAboutFormData(
+      {
+        title: data.title,
+        description: data.description,
+        company_name: data.company_name,
+        logo: data.logo ?? undefined,
+        status: data.status,
+        application_url: data.application_url,
+        closes_at: data.closes_at,
+        sort_order: data.sort_order,
+      },
+      true
+    );
+    const response = await this.client.post<{ data: JobListing }>(
+      endpoints.job(id),
+      body
+    );
+    return response.data;
+  }
+
+  async deleteJob(id: number): Promise<void> {
+    await this.client.delete(endpoints.job(id));
   }
 }
 

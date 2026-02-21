@@ -20,6 +20,9 @@ import { AdvisoryBodyListPage } from '@/pages/AdvisoryBodyListPage';
 import { HonorBoardListPage } from '@/pages/HonorBoardListPage';
 import { BatchRepresentativesListPage } from '@/pages/BatchRepresentativesListPage';
 import { DownloadsListPage } from '@/pages/DownloadsListPage';
+import { GalleryListPage } from '@/pages/GalleryListPage';
+import { NewsListPage } from '@/pages/NewsListPage';
+import { JobsListPage } from '@/pages/JobsListPage';
 import { EventsListPage } from '@/pages/EventsListPage';
 import { EventDetailPage } from '@/pages/EventDetailPage';
 import { CreateEventPage } from '@/pages/CreateEventPage';
@@ -66,6 +69,9 @@ function App() {
             <Route path="scholarship-applications" element={<ScholarshipApplicationsListPage />} />
             <Route path="scholarship-applications/:id" element={<ScholarshipApplicationDetailPage />} />
             <Route path="downloads" element={<DownloadsListPage />} />
+            <Route path="gallery" element={<GalleryListPage />} />
+            <Route path="news" element={<NewsListPage />} />
+            <Route path="jobs" element={<JobsListPage />} />
             <Route path="events" element={<EventsListPage />} />
             <Route path="events/new" element={<CreateEventPage />} />
             <Route path="events/:id" element={<EventDetailPage />} />

@@ -450,3 +450,39 @@ export interface Download {
   sort_order: number;
   created_at: string;
 }
+
+export interface GalleryPhoto {
+  id: number;
+  url: string | null;
+  category: string;
+  sort_order: number;
+}
+
+export interface NewsItem {
+  id: number;
+  slug: string;
+  title: string;
+  description: string | null;
+  body: string | null;
+  image: string | null;
+  author: string | null;
+  published_at: string | null;
+  is_published?: boolean;
+  sort_order?: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface JobListing {
+  id: number;
+  title: string;
+  description: string | null;
+  company_name: string | null;
+  logo: string | null;
+  status: 'active' | 'expired';
+  application_url: string | null;
+  closes_at: string | null;
+  sort_order?: number;
+  created_at: string;
+  updated_at: string;
+}

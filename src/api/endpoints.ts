@@ -75,4 +75,12 @@ export const endpoints = {
     `${API_BASE}/scholarship-applications/${id}/approve`,
   rejectScholarshipApplication: (id: number) =>
     `${API_BASE}/scholarship-applications/${id}/reject`,
+
+  // Homepage content
+  galleryPhotos: `${API_BASE}/gallery-photos`,
+  galleryPhoto: (id: number) => `${API_BASE}/gallery-photos/${id}`,
+  news: `${API_BASE}/news`,
+  newsItem: (id: number) => `${API_BASE}/news/${id}`,
+  jobs: `${API_BASE}/jobs`,
+  job: (id: number) => `${API_BASE}/jobs/${id}`,
 } as const;
