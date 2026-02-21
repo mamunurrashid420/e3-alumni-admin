@@ -161,7 +161,7 @@ export function HonorBoardListPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl xl:text-3xl font-bold">Honor Board</h1>
-          <p className="text-sm lg:text-base text-gray-600 mt-1">President and General Secretary</p>
+          <p className="text-sm lg:text-base text-gray-600 mt-1">President and Secretary General</p>
         </div>
         <Button onClick={openAdd}>Add Entry</Button>
       </div>
@@ -248,7 +248,7 @@ export function HonorBoardListPage() {
                 <SelectContent>
                   {ROLES.map((r) => (
                     <SelectItem key={r} value={r}>
-                      {r === 'GeneralSecretary' ? 'General Secretary' : r}
+                      {r === 'GeneralSecretary' ? 'Secretary General' : r}
                     </SelectItem>
                   ))}
                 </SelectContent>
