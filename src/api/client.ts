@@ -33,6 +33,7 @@ import type {
   Download,
   EventListResponse,
   EventDetailResponse,
+  EventRegistration,
   EventRegistrationsResponse,
   EventStatus,
   ScholarshipApplication,
@@ -814,9 +815,23 @@ class ApiClient {
     await this.client.delete(endpoints.eventPhoto(eventId, photoId));
   }
 
-  async getEventRegistrations(id: number): Promise<EventRegistrationsResponse> {
+  async getEventRegistrations(
+    id: number,
+    params?: { page?: number; per_page?: number }
+  ): Promise<PaginatedResponse<EventRegistration>> {
+    const requestParams: Record<string, number> = {};
+    if (params?.page != null && params.page > 1) requestParams.page = params.page;
+    if (params?.per_page != null) requestParams.per_page = params.per_page;
+    const response = await this.client.get<
+      PaginatedResponse<EventRegistration>
+    >(endpoints.eventRegistrations(id), { params: requestParams });
+    return response.data;
+  }
+
+  async getEventRegistrationsAll(id: number): Promise<EventRegistrationsResponse> {
     const response = await this.client.get<EventRegistrationsResponse>(
-      endpoints.eventRegistrations(id)
+      endpoints.eventRegistrations(id),
+      { params: { all: 1 } }
     );
     return response.data;
   }

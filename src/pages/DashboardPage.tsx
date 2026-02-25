@@ -36,7 +36,7 @@ export function DashboardPage() {
       description: 'Rejected applications',
     },
     {
-      title: 'Income',
+      title: 'Collection',
       value: totalApprovedAmount != null ? formatCurrency(Number(totalApprovedAmount)) : '—',
       description: 'Total approved payments',
     },

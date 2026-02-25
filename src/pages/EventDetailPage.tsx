@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEvent } from '@/hooks/useEvent';
+import { useEventRegistrations } from '@/hooks/useEventRegistrations';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -17,15 +18,23 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Pagination } from '@/components/ui/pagination';
 import { formatDateTime } from '@/lib/format';
-import { Calendar, MapPin, Pencil, ArrowLeft } from 'lucide-react';
+import { Calendar, MapPin, Pencil, ArrowLeft, Download } from 'lucide-react';
 import { PhotoViewer } from '@/components/PhotoViewer';
 
 export function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const eventId = id ? parseInt(id, 10) : null;
-  const { event, registrations, loading, error, refetchEvent } = useEvent(eventId);
+  const [registrationsPage, setRegistrationsPage] = useState(1);
+  const { event, loading, error, refetchEvent } = useEvent(eventId);
+  const {
+    registrations,
+    loading: registrationsLoading,
+    pagination,
+    exportAll,
+  } = useEventRegistrations(eventId, registrationsPage);
   const [photoViewerOpen, setPhotoViewerOpen] = useState(false);
   const [photoViewerSrc, setPhotoViewerSrc] = useState<string | null>(null);
   const [photoViewerAlt, setPhotoViewerAlt] = useState('');
@@ -187,76 +196,109 @@ export function EventDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Registrations</CardTitle>
-          <CardDescription>{registrations.length} registered</CardDescription>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <CardTitle>Registrations</CardTitle>
+              <CardDescription>
+                {pagination
+                  ? `Showing ${pagination.from} to ${pagination.to} of ${pagination.total} registered`
+                  : event.registration_count != null
+                    ? `${event.registration_count} registered`
+                    : 'Event registrations'}
+              </CardDescription>
+            </div>
+            {event.registration_count != null && event.registration_count > 0 && (
+              <div className="flex justify-end shrink-0">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => exportAll(event.title)}
+                  className="gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Export CSV
+                </Button>
+              </div>
+            )}
+          </div>
         </CardHeader>
-        <CardContent>
-          {registrations.length === 0 ? (
+        <CardContent className="space-y-4">
+          {registrationsLoading && registrations.length === 0 ? (
+            <p className="text-gray-500 text-sm">Loading registrations...</p>
+          ) : registrations.length === 0 ? (
             <p className="text-gray-500 text-sm">No registrations yet.</p>
           ) : (
-            <div className="rounded-md border overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Member ID</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>Address</TableHead>
-                    <TableHead>SSC Batch</TableHead>
-                    <TableHead className="text-right">Guests</TableHead>
-                    <TableHead>Guest details</TableHead>
-                    <TableHead className="text-right">Fee</TableHead>
-                    <TableHead className="text-right">Total fees</TableHead>
-                    <TableHead>Payment</TableHead>
-                    <TableHead>Notes</TableHead>
-                    <TableHead>Registered at</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {registrations.map((reg) => (
-                    <TableRow key={reg.id}>
-                      <TableCell>{reg.name ?? reg.user?.name ?? '—'}</TableCell>
-                      <TableCell>{reg.user?.member_id ?? '—'}</TableCell>
-                      <TableCell>{reg.user?.email ?? '—'}</TableCell>
-                      <TableCell>{reg.phone ?? reg.user?.phone ?? '—'}</TableCell>
-                      <TableCell className="max-w-[180px] truncate" title={reg.address ?? undefined}>
-                        {reg.address ?? '—'}
-                      </TableCell>
-                      <TableCell>{reg.ssc_jsc ?? '—'}</TableCell>
-                      <TableCell className="text-right">{reg.guest_count ?? 0}</TableCell>
-                      <TableCell className="max-w-[140px] truncate" title={reg.guest_details ?? undefined}>
-                        {reg.guest_details ?? '—'}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {reg.participant_fee != null ? reg.participant_fee : '—'}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {reg.total_fees != null ? reg.total_fees : '—'}
-                      </TableCell>
-                      <TableCell>
-                        {reg.payment_document_url ? (
-                          <a
-                            href={reg.payment_document_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline"
-                          >
-                            View
-                          </a>
-                        ) : (
-                          '—'
-                        )}
-                      </TableCell>
-                      <TableCell className="max-w-[200px] truncate" title={reg.notes ?? undefined}>
-                        {reg.notes ?? '—'}
-                      </TableCell>
-                      <TableCell>{formatDateTime(reg.registered_at)}</TableCell>
+            <>
+              <div className="rounded-md border overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Member ID</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Phone</TableHead>
+                      <TableHead>Address</TableHead>
+                      <TableHead>SSC Batch</TableHead>
+                      <TableHead className="text-right">Guests</TableHead>
+                      <TableHead>Guest details</TableHead>
+                      <TableHead className="text-right">Fee</TableHead>
+                      <TableHead className="text-right">Total fees</TableHead>
+                      <TableHead>Payment</TableHead>
+                      <TableHead>Notes</TableHead>
+                      <TableHead>Registered at</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  </TableHeader>
+                  <TableBody>
+                    {registrations.map((reg) => (
+                      <TableRow key={reg.id}>
+                        <TableCell>{reg.name ?? reg.user?.name ?? '—'}</TableCell>
+                        <TableCell>{reg.user?.member_id ?? '—'}</TableCell>
+                        <TableCell>{reg.user?.email ?? '—'}</TableCell>
+                        <TableCell>{reg.phone ?? reg.user?.phone ?? '—'}</TableCell>
+                        <TableCell className="max-w-[180px] truncate" title={reg.address ?? undefined}>
+                          {reg.address ?? '—'}
+                        </TableCell>
+                        <TableCell>{reg.ssc_jsc ?? '—'}</TableCell>
+                        <TableCell className="text-right">{reg.guest_count ?? 0}</TableCell>
+                        <TableCell className="max-w-[140px] truncate" title={reg.guest_details ?? undefined}>
+                          {reg.guest_details ?? '—'}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {reg.participant_fee != null ? reg.participant_fee : '—'}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {reg.total_fees != null ? reg.total_fees : '—'}
+                        </TableCell>
+                        <TableCell>
+                          {reg.payment_document_url ? (
+                            <a
+                              href={reg.payment_document_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline"
+                            >
+                              View
+                            </a>
+                          ) : (
+                            '—'
+                          )}
+                        </TableCell>
+                        <TableCell className="max-w-[200px] truncate" title={reg.notes ?? undefined}>
+                          {reg.notes ?? '—'}
+                        </TableCell>
+                        <TableCell>{formatDateTime(reg.registered_at)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              {pagination && pagination.last_page > 1 && (
+                <Pagination
+                  pagination={pagination}
+                  onPageChange={setRegistrationsPage}
+                />
+              )}
+            </>
           )}
         </CardContent>
       </Card>
