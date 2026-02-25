@@ -19,9 +19,16 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Pagination } from '@/components/ui/pagination';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { formatDateTime } from '@/lib/format';
 import { Calendar, MapPin, Pencil, ArrowLeft, Download } from 'lucide-react';
 import { PhotoViewer } from '@/components/PhotoViewer';
+import type { EventRegistration } from '@/types/api';
 
 export function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -38,6 +45,8 @@ export function EventDetailPage() {
   const [photoViewerOpen, setPhotoViewerOpen] = useState(false);
   const [photoViewerSrc, setPhotoViewerSrc] = useState<string | null>(null);
   const [photoViewerAlt, setPhotoViewerAlt] = useState('');
+  const [selectedRegistration, setSelectedRegistration] =
+    useState<EventRegistration | null>(null);
 
   if (eventId == null || Number.isNaN(eventId)) {
     return (
@@ -229,66 +238,94 @@ export function EventDetailPage() {
             <p className="text-gray-500 text-sm">No registrations yet.</p>
           ) : (
             <>
-              <div className="rounded-md border overflow-x-auto">
-                <Table>
+              <div className="rounded-md border overflow-x-auto max-w-full">
+                <Table className="table-fixed min-w-[900px]">
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Member ID</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Phone</TableHead>
-                      <TableHead>Address</TableHead>
-                      <TableHead>SSC Batch</TableHead>
-                      <TableHead className="text-right">Guests</TableHead>
-                      <TableHead>Guest details</TableHead>
-                      <TableHead className="text-right">Fee</TableHead>
-                      <TableHead className="text-right">Total fees</TableHead>
-                      <TableHead>Payment</TableHead>
-                      <TableHead>Notes</TableHead>
-                      <TableHead>Registered at</TableHead>
+                      <TableHead className="w-[9%] min-w-0">Name</TableHead>
+                      <TableHead className="w-[7%] min-w-0">Member ID</TableHead>
+                      <TableHead className="w-[11%] min-w-0">Email</TableHead>
+                      <TableHead className="w-[8%] min-w-0">Phone</TableHead>
+                      <TableHead className="w-[11%] min-w-0">Address</TableHead>
+                      <TableHead className="w-[6%] min-w-0">SSC Batch</TableHead>
+                      <TableHead className="w-[5%] min-w-0 text-right">Guests</TableHead>
+                      <TableHead className="w-[9%] min-w-0">Guest details</TableHead>
+                      <TableHead className="w-[5%] min-w-0 text-right">Fee</TableHead>
+                      <TableHead className="w-[5%] min-w-0 text-right">Total fees</TableHead>
+                      <TableHead className="w-[5%] min-w-0">Payment</TableHead>
+                      <TableHead className="w-[9%] min-w-0">Notes</TableHead>
+                      <TableHead className="w-[9%] min-w-0">Registered at</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {registrations.map((reg) => (
-                      <TableRow key={reg.id}>
-                        <TableCell>{reg.name ?? reg.user?.name ?? '—'}</TableCell>
-                        <TableCell>{reg.user?.member_id ?? '—'}</TableCell>
-                        <TableCell>{reg.user?.email ?? '—'}</TableCell>
-                        <TableCell>{reg.phone ?? reg.user?.phone ?? '—'}</TableCell>
-                        <TableCell className="max-w-[180px] truncate" title={reg.address ?? undefined}>
-                          {reg.address ?? '—'}
-                        </TableCell>
-                        <TableCell>{reg.ssc_jsc ?? '—'}</TableCell>
-                        <TableCell className="text-right">{reg.guest_count ?? 0}</TableCell>
-                        <TableCell className="max-w-[140px] truncate" title={reg.guest_details ?? undefined}>
-                          {reg.guest_details ?? '—'}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          {reg.participant_fee != null ? reg.participant_fee : '—'}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          {reg.total_fees != null ? reg.total_fees : '—'}
-                        </TableCell>
-                        <TableCell>
-                          {reg.payment_document_url ? (
-                            <a
-                              href={reg.payment_document_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:underline"
-                            >
-                              View
-                            </a>
-                          ) : (
-                            '—'
-                          )}
-                        </TableCell>
-                        <TableCell className="max-w-[200px] truncate" title={reg.notes ?? undefined}>
-                          {reg.notes ?? '—'}
-                        </TableCell>
-                        <TableCell>{formatDateTime(reg.registered_at)}</TableCell>
-                      </TableRow>
-                    ))}
+                    {registrations.map((reg) => {
+                      const name = reg.name ?? reg.user?.name ?? '—';
+                      const email = reg.user?.email ?? '—';
+                      const phone = reg.phone ?? reg.user?.phone ?? '—';
+                      const address = reg.address ?? '—';
+                      const guestDetails = reg.guest_details ?? '—';
+                      const notes = reg.notes ?? '—';
+                      return (
+                        <TableRow
+                          key={reg.id}
+                          className="cursor-pointer hover:bg-muted/50"
+                          onClick={() => setSelectedRegistration(reg)}
+                        >
+                          <TableCell className="min-w-0 truncate" title={name}>
+                            {name}
+                          </TableCell>
+                          <TableCell className="min-w-0 truncate" title={reg.user?.member_id ?? undefined}>
+                            {reg.user?.member_id ?? '—'}
+                          </TableCell>
+                          <TableCell className="min-w-0 truncate" title={email}>
+                            {email}
+                          </TableCell>
+                          <TableCell className="min-w-0 truncate" title={phone}>
+                            {phone}
+                          </TableCell>
+                          <TableCell className="min-w-0 truncate" title={address || undefined}>
+                            {address || '—'}
+                          </TableCell>
+                          <TableCell className="min-w-0 truncate" title={reg.ssc_jsc ?? undefined}>
+                            {reg.ssc_jsc ?? '—'}
+                          </TableCell>
+                          <TableCell className="min-w-0 text-right">{reg.guest_count ?? 0}</TableCell>
+                          <TableCell className="min-w-0 truncate" title={guestDetails || undefined}>
+                            {guestDetails || '—'}
+                          </TableCell>
+                          <TableCell className="min-w-0 text-right">
+                            {reg.participant_fee != null ? reg.participant_fee : '—'}
+                          </TableCell>
+                          <TableCell className="min-w-0 text-right">
+                            {reg.total_fees != null ? reg.total_fees : '—'}
+                          </TableCell>
+                          <TableCell
+                            className="min-w-0"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {reg.payment_document_url ? (
+                              <a
+                                href={reg.payment_document_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:underline truncate inline-block max-w-full"
+                                title="Open payment document"
+                              >
+                                View
+                              </a>
+                            ) : (
+                              '—'
+                            )}
+                          </TableCell>
+                          <TableCell className="min-w-0 truncate" title={notes || undefined}>
+                            {notes || '—'}
+                          </TableCell>
+                          <TableCell className="min-w-0 whitespace-nowrap" title={formatDateTime(reg.registered_at)}>
+                            {formatDateTime(reg.registered_at)}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </div>
@@ -302,6 +339,80 @@ export function EventDetailPage() {
           )}
         </CardContent>
       </Card>
+
+      <Dialog
+        open={selectedRegistration != null}
+        onOpenChange={(open) => !open && setSelectedRegistration(null)}
+      >
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Registration details</DialogTitle>
+          </DialogHeader>
+          {selectedRegistration && (
+            <RegistrationDetailContent reg={selectedRegistration} />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+function RegistrationDetailContent({ reg }: { reg: EventRegistration }) {
+  const name = reg.name ?? reg.user?.name ?? '—';
+  const email = reg.user?.email ?? '—';
+  const phone = reg.phone ?? reg.user?.phone ?? '—';
+  return (
+    <dl className="grid gap-3 text-sm sm:grid-cols-[auto_1fr]">
+      <DetailRow label="Name" value={name} />
+      <DetailRow label="Member ID" value={reg.user?.member_id ?? '—'} />
+      <DetailRow label="Email" value={email} />
+      <DetailRow label="Phone" value={phone} />
+      <DetailRow label="Address" value={reg.address ?? '—'} />
+      <DetailRow label="SSC Batch" value={reg.ssc_jsc ?? '—'} />
+      <DetailRow label="Guests" value={String(reg.guest_count ?? 0)} />
+      <DetailRow label="Guest details" value={reg.guest_details ?? '—'} />
+      <DetailRow
+        label="Participant fee"
+        value={reg.participant_fee != null ? String(reg.participant_fee) : '—'}
+      />
+      <DetailRow
+        label="Total fees"
+        value={reg.total_fees != null ? String(reg.total_fees) : '—'}
+      />
+      <DetailRow
+        label="Payment"
+        value={
+          reg.payment_document_url ? (
+            <a
+              href={reg.payment_document_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              View document
+            </a>
+          ) : (
+            '—'
+          )
+        }
+      />
+      <DetailRow label="Notes" value={reg.notes ?? '—'} />
+      <DetailRow label="Registered at" value={formatDateTime(reg.registered_at)} />
+    </dl>
+  );
+}
+
+function DetailRow({
+  label,
+  value,
+}: {
+  label: string;
+  value: React.ReactNode;
+}) {
+  return (
+    <>
+      <dt className="font-medium text-muted-foreground">{label}</dt>
+      <dd className="break-words">{value}</dd>
+    </>
   );
 }
