@@ -12,6 +12,7 @@ import { SelfDeclarationsListPage } from '@/pages/SelfDeclarationsListPage';
 import { SelfDeclarationDetailPage } from '@/pages/SelfDeclarationDetailPage';
 import { MembersListPage } from '@/pages/MembersListPage';
 import { MemberDetailPage } from '@/pages/MemberDetailPage';
+import { AddMemberPage } from '@/pages/AddMemberPage';
 import { BloodDonorsListPage } from '@/pages/BloodDonorsListPage';
 import { PaymentsListPage } from '@/pages/PaymentsListPage';
 import { PaymentDetailPage } from '@/pages/PaymentDetailPage';
@@ -19,8 +20,14 @@ import { ConveningCommitteeListPage } from '@/pages/ConveningCommitteeListPage';
 import { AdvisoryBodyListPage } from '@/pages/AdvisoryBodyListPage';
 import { HonorBoardListPage } from '@/pages/HonorBoardListPage';
 import { BatchRepresentativesListPage } from '@/pages/BatchRepresentativesListPage';
+import { ExecutiveMembersListPage } from '@/pages/ExecutiveMembersListPage';
 import { DownloadsListPage } from '@/pages/DownloadsListPage';
 import { GalleryListPage } from '@/pages/GalleryListPage';
+import { SliderListPage } from '@/pages/SliderListPage';
+import { AboutSectionPage } from '@/pages/AboutSectionPage';
+import { AuthPageSectionPage } from '@/pages/AuthPageSectionPage';
+import { CommunitySectionPage } from '@/pages/CommunitySectionPage';
+import { HealthSectionPage } from '@/pages/HealthSectionPage';
 import { NoticesListPage } from '@/pages/NoticesListPage';
 import { NewsListPage } from '@/pages/NewsListPage';
 import { JobsListPage } from '@/pages/JobsListPage';
@@ -62,6 +69,7 @@ function App() {
             <Route path="self-declarations" element={<SelfDeclarationsListPage />} />
             <Route path="self-declarations/:id" element={<SelfDeclarationDetailPage />} />
             <Route path="members" element={<MembersListPage />} />
+            <Route path="members/new" element={<AddMemberPage />} />
             <Route path="members/:id" element={<MemberDetailPage />} />
             <Route path="blood-donors" element={<BloodDonorsListPage />} />
             <Route path="payments" element={<PaymentsListPage />} />
@@ -71,6 +79,11 @@ function App() {
             <Route path="scholarship-applications/:id" element={<ScholarshipApplicationDetailPage />} />
             <Route path="downloads" element={<DownloadsListPage />} />
             <Route path="gallery" element={<GalleryListPage />} />
+            <Route path="slider" element={<SliderListPage />} />
+            <Route path="about-section" element={<AboutSectionPage />} />
+            <Route path="auth-page" element={<AuthPageSectionPage />} />
+            <Route path="health-section" element={<HealthSectionPage />} />
+            <Route path="community-section" element={<CommunitySectionPage />} />
             <Route path="notices" element={<NoticesListPage />} />
             <Route path="news" element={<NewsListPage />} />
             <Route path="jobs" element={<JobsListPage />} />
@@ -78,6 +91,7 @@ function App() {
             <Route path="events/new" element={<CreateEventPage />} />
             <Route path="events/:id" element={<EventDetailPage />} />
             <Route path="events/:id/edit" element={<EditEventPage />} />
+            <Route path="about/executive-members" element={<ExecutiveMembersListPage />} />
             <Route path="about/convening-committee" element={<ConveningCommitteeListPage />} />
             <Route path="about/advisory-body" element={<AdvisoryBodyListPage />} />
             <Route path="about/honor-board" element={<HonorBoardListPage />} />

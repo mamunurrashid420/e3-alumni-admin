@@ -8,12 +8,16 @@ interface UseMembersParams {
   search?: string;
   primaryMemberType?: MembershipType;
   page?: number;
+  perPage?: number;
+  executiveOnly?: boolean;
 }
 
 export function useMembers({
   search,
   primaryMemberType,
   page = 1,
+  perPage,
+  executiveOnly,
 }: UseMembersParams = {}) {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,7 +32,11 @@ export function useMembers({
       const response = await apiClient.getMembers(
         search,
         primaryMemberType,
-        page
+        page,
+        perPage,
+        undefined,
+        undefined,
+        executiveOnly
       );
       setMembers(response.data);
       setPagination(response.meta);
@@ -43,7 +51,7 @@ export function useMembers({
 
   useEffect(() => {
     loadMembers();
-  }, [search, primaryMemberType, page]);
+  }, [search, primaryMemberType, page, perPage, executiveOnly]);
 
   return {
     members,

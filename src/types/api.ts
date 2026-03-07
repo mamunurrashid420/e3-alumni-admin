@@ -169,6 +169,7 @@ export interface MemberProfile {
   t_shirt_size: string | null;
   blood_group: string | null;
   photo: string | null;
+  executive_photo: string | null;
   signature: string | null;
   created_at: string;
   updated_at: string;
@@ -461,6 +462,20 @@ export interface GalleryPhoto {
   url: string | null;
   category: string;
   sort_order: number;
+}
+
+export interface HeroSlide {
+  id: number;
+  image: string | null;
+  title: string;
+  subtitle: string | null;
+  description: string | null;
+  primary_button_label: string | null;
+  primary_button_url: string | null;
+  secondary_button_label: string | null;
+  secondary_button_url: string | null;
+  sort_order: number;
+  is_active: boolean;
 }
 
 export interface NoticeItem {

@@ -19,8 +19,10 @@ export const endpoints = {
   // Members
   members: `${API_BASE}/members`,
   member: (id: number) => `${API_BASE}/members/${id}`,
+  memberTypes: `${API_BASE}/member-types`,
   updateMember: (id: number) => `${API_BASE}/members/${id}`,
   memberProfile: (id: number) => `${API_BASE}/members/${id}/profile`,
+  executivePhoto: (id: number) => `${API_BASE}/members/${id}/executive-photo`,
   resendSms: (id: number) => `${API_BASE}/members/${id}/resend-sms`,
   renewMembership: (id: number) => `${API_BASE}/members/${id}/renew-membership`,
   disableMember: (id: number) => `${API_BASE}/members/${id}/disable`,
@@ -79,6 +81,12 @@ export const endpoints = {
   // Homepage content
   galleryPhotos: `${API_BASE}/gallery-photos`,
   galleryPhoto: (id: number) => `${API_BASE}/gallery-photos/${id}`,
+  aboutSection: `${API_BASE}/about-section`,
+  authPage: `${API_BASE}/auth-page`,
+  communitySection: `${API_BASE}/community-section`,
+  healthSection: `${API_BASE}/health-section`,
+  heroSlides: `${API_BASE}/hero-slides`,
+  heroSlide: (id: number) => `${API_BASE}/hero-slides/${id}`,
   notices: `${API_BASE}/notices`,
   notice: (id: number) => `${API_BASE}/notices/${id}`,
   news: `${API_BASE}/news`,

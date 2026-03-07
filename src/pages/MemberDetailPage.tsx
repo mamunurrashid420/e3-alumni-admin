@@ -98,12 +98,20 @@ export function MemberDetailPage() {
   const [renewYears, setRenewYears] = useState<1 | 2 | 3>(1);
   const [renewing, setRenewing] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [executivePhotoFile, setExecutivePhotoFile] = useState<File | null>(null);
+  const [uploadingExecutivePhoto, setUploadingExecutivePhoto] = useState(false);
   const [disabling, setDisabling] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [memberTypes, setMemberTypes] = useState<{ id: number; name: string; description: string | null }[]>([]);
+  const [savingSecondaryType, setSavingSecondaryType] = useState(false);
 
   useEffect(() => {
     loadMember();
   }, [id]);
+
+  useEffect(() => {
+    apiClient.getMemberTypes().then((res) => setMemberTypes(res.data)).catch(() => {});
+  }, []);
 
   const loadMember = async () => {
     if (!id) return;
@@ -161,6 +169,45 @@ export function MemberDetailPage() {
       toast.error(errorMessage);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSecondaryTypeChange = async (value: string) => {
+    if (!member?.id || !member.phone) return;
+    const id = value === 'none' ? null : parseInt(value, 10);
+    if (value !== 'none' && Number.isNaN(id)) return;
+    try {
+      setSavingSecondaryType(true);
+      const response = await apiClient.updateMember(member.id, {
+        name: member.name,
+        email: member.email ?? null,
+        phone: member.phone,
+        secondary_member_type_id: id,
+      });
+      const { phone_changed: _pc, ...updatedMember } = response;
+      setMember({ ...member, ...updatedMember });
+      toast.success(
+        id ? 'Executive role set. Member will appear on Executive Members page.' : 'Executive role cleared.'
+      );
+    } catch (err) {
+      toast.error(handleApiError(err));
+    } finally {
+      setSavingSecondaryType(false);
+    }
+  };
+
+  const handleUploadExecutivePhoto = async () => {
+    if (!member?.id || !executivePhotoFile) return;
+    try {
+      setUploadingExecutivePhoto(true);
+      const updated = await apiClient.updateExecutivePhoto(member.id, executivePhotoFile);
+      setMember(updated);
+      setExecutivePhotoFile(null);
+      toast.success('Executive display image updated. It will show on the public Executive Members page.');
+    } catch (err) {
+      toast.error(handleApiError(err));
+    } finally {
+      setUploadingExecutivePhoto(false);
     }
   };
 
@@ -601,24 +648,70 @@ export function MemberDetailPage() {
               )}
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500">
-                Secondary Member Type
+              <p className="text-sm font-medium text-gray-500 mb-1">
+                Executive role (Secondary Member Type)
               </p>
-              {member.secondary_member_type ? (
-                <div>
-                  <p className="text-base font-medium">
-                    {member.secondary_member_type.name}
-                  </p>
-                  {member.secondary_member_type.description && (
-                    <p className="text-sm text-gray-600 mt-1">
-                      {member.secondary_member_type.description}
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <p className="text-base text-gray-400">N/A</p>
-              )}
+              <p className="text-xs text-gray-500 mb-2">
+                Set to show this member on the public Executive Members page.
+              </p>
+              <Select
+                value={member.secondary_member_type?.id?.toString() ?? 'none'}
+                onValueChange={handleSecondaryTypeChange}
+                disabled={savingSecondaryType}
+              >
+                <SelectTrigger className="max-w-xs">
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
+                  {memberTypes.map((mt) => (
+                    <SelectItem key={mt.id} value={String(mt.id)}>
+                      {mt.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
+            {member.secondary_member_type_id != null && (
+              <div className="pt-4 border-t">
+                <p className="text-sm font-medium text-gray-500 mb-2">
+                  Executive display image
+                </p>
+                <p className="text-xs text-gray-500 mb-3">
+                  This image is shown on the public Executive Members page. Upload to set or replace.
+                </p>
+                <div className="flex flex-wrap items-end gap-4">
+                  <div className="flex-shrink-0">
+                    {member.profile?.executive_photo ? (
+                      <img
+                        src={member.profile.executive_photo}
+                        alt="Executive"
+                        className="h-20 w-20 rounded-full object-cover ring-2 ring-gray-200"
+                      />
+                    ) : (
+                      <div className="h-20 w-20 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
+                        No image
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Input
+                      type="file"
+                      accept="image/jpeg,image/png,image/jpg"
+                      className="max-w-[200px]"
+                      onChange={(e) => setExecutivePhotoFile(e.target.files?.[0] ?? null)}
+                    />
+                    <Button
+                      size="sm"
+                      disabled={!executivePhotoFile || uploadingExecutivePhoto}
+                      onClick={handleUploadExecutivePhoto}
+                    >
+                      {uploadingExecutivePhoto ? 'Uploading…' : 'Upload image'}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
