@@ -15,7 +15,6 @@ import {
   BookOpen,
   Droplets,
   ImageIcon,
-  ImagePlus,
   Megaphone,
   Newspaper,
   Briefcase,
@@ -123,46 +122,6 @@ function SidebarNav({ onLinkClick }: { onLinkClick?: () => void }) {
         <span>Gallery</span>
       </NavLink>
       <NavLink
-        to="/slider"
-        className={linkClass}
-        onClick={onLinkClick}
-      >
-        <ImagePlus className="w-5 h-5" />
-        <span>Homepage Slider</span>
-      </NavLink>
-      <NavLink
-        to="/about-section"
-        className={linkClass}
-        onClick={onLinkClick}
-      >
-        <ImageIcon className="w-5 h-5" />
-        <span>About Us Images</span>
-      </NavLink>
-      <NavLink
-        to="/auth-page"
-        className={linkClass}
-        onClick={onLinkClick}
-      >
-        <ImageIcon className="w-5 h-5" />
-        <span>Login & Registration Image</span>
-      </NavLink>
-      <NavLink
-        to="/health-section"
-        className={linkClass}
-        onClick={onLinkClick}
-      >
-        <ImageIcon className="w-5 h-5" />
-        <span>Health Section Images</span>
-      </NavLink>
-      <NavLink
-        to="/community-section"
-        className={linkClass}
-        onClick={onLinkClick}
-      >
-        <ImageIcon className="w-5 h-5" />
-        <span>Community Section Image</span>
-      </NavLink>
-      <NavLink
         to="/notices"
         className={linkClass}
         onClick={onLinkClick}
@@ -195,14 +154,6 @@ function SidebarNav({ onLinkClick }: { onLinkClick?: () => void }) {
         <span>Events</span>
       </NavLink>
       <div className="pt-4 border-t">
-        <NavLink
-          to="/about/executive-members"
-          className={linkClass}
-          onClick={onLinkClick}
-        >
-          <Users className="w-5 h-5" />
-          <span>Executive Members</span>
-        </NavLink>
         <NavLink
           to="/about/convening-committee"
           className={linkClass}

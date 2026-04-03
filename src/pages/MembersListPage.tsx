@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useMembers } from '@/hooks/useMembers';
 import { apiClient } from '@/api/client';
 import type { MembershipType, Member } from '@/types/api';
@@ -34,7 +34,7 @@ import { MEMBERSHIP_TYPE_LABELS } from '@/lib/constants';
 import { formatDate } from '@/lib/format';
 import { handleApiError } from '@/lib/errorHandler';
 import { toast } from 'sonner';
-import { Search, X, Download, Pencil, UserMinus, UserCheck, UserPlus } from 'lucide-react';
+import { Search, X, Download, Pencil, UserMinus, UserCheck } from 'lucide-react';
 
 const EXPORT_PER_PAGE = 10000;
 const MEMBER_CSV_COLUMNS = [
@@ -214,23 +214,15 @@ export function MembersListPage() {
             View and manage all member users
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button asChild>
-            <Link to="/members/new" className="gap-2">
-              <UserPlus className="w-4 h-4" />
-              Add member
-            </Link>
-          </Button>
-          <Button
-            variant="outline"
-            onClick={handleExportCsv}
-            disabled={exportLoading}
-            className="gap-2"
-          >
-            <Download className="w-4 h-4" />
-            {exportLoading ? 'Exporting...' : 'Export CSV'}
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          onClick={handleExportCsv}
+          disabled={exportLoading}
+          className="gap-2"
+        >
+          <Download className="w-4 h-4" />
+          {exportLoading ? 'Exporting...' : 'Export CSV'}
+        </Button>
       </div>
 
       <Card>

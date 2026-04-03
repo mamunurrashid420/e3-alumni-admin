@@ -44,7 +44,6 @@ import type {
   ApproveScholarshipApplicationResponse,
   RejectScholarshipApplicationResponse,
   GalleryPhoto,
-  HeroSlide,
   NoticeItem,
   NewsItem,
   JobListing,
@@ -194,8 +193,7 @@ class ApiClient {
     page: number = 1,
     perPage?: number,
     bloodDonors?: boolean,
-    bloodGroup?: string,
-    executiveOnly?: boolean
+    bloodGroup?: string
   ): Promise<PaginatedResponse<Member>> {
     const params: Record<string, string> = {};
     if (search) params.search = search;
@@ -204,7 +202,6 @@ class ApiClient {
     if (perPage != null) params.per_page = perPage.toString();
     if (bloodDonors) params.blood_donors = '1';
     if (bloodGroup) params.blood_group = bloodGroup;
-    if (executiveOnly) params.executive_only = '1';
     const response = await this.client.get<PaginatedResponse<Member>>(
       endpoints.members,
       { params }
@@ -219,41 +216,13 @@ class ApiClient {
     return response.data;
   }
 
-  async createMember(data: {
-    name: string;
-    email?: string | null;
-    phone: string;
-    primary_member_type: string;
-    ssc_year?: number | null;
-    jsc_year?: number | null;
-  }): Promise<Member> {
-    const response = await this.client.post<Member | { data: Member }>(
-      endpoints.members,
-      data
-    );
-    const body = response.data as Member | { data: Member };
-    return 'data' in body && body.data ? body.data : (body as Member);
-  }
-
   async updateMember(
     id: number,
-    data: {
-      name: string;
-      email?: string | null;
-      phone: string;
-      secondary_member_type_id?: number | null;
-    }
+    data: { name: string; email?: string | null; phone: string }
   ): Promise<Member & { phone_changed?: boolean }> {
     const response = await this.client.put<
       Member & { phone_changed?: boolean }
     >(endpoints.updateMember(id), data);
-    return response.data;
-  }
-
-  async getMemberTypes(): Promise<{ data: { id: number; name: string; description: string | null }[] }> {
-    const response = await this.client.get<{
-      data: { id: number; name: string; description: string | null }[];
-    }>(endpoints.memberTypes);
     return response.data;
   }
 
@@ -296,17 +265,6 @@ class ApiClient {
       endpoints.deleteMember(id)
     );
     return response.data;
-  }
-
-  async updateExecutivePhoto(id: number, photo: File): Promise<Member> {
-    const formData = new FormData();
-    formData.append('photo', photo);
-    const response = await this.client.post<{ data: Member }>(
-      endpoints.executivePhoto(id),
-      formData
-    );
-    const body = response.data as { data?: Member };
-    return body.data ?? (response.data as Member);
   }
 
   async updateMemberProfile(
@@ -658,7 +616,7 @@ class ApiClient {
       photo?: File | null;
     }
   ): Promise<{ data: HonorBoardEntry }> {
-    const body = this.buildAboutFormData(data, false);
+    const body = this.buildAboutFormData(data, true);
     const response = await this.client.post<{ data: HonorBoardEntry }>(
       endpoints.honorBoardEntry(id),
       body
@@ -929,167 +887,6 @@ class ApiClient {
 
   async deleteGalleryPhoto(id: number): Promise<void> {
     await this.client.delete(endpoints.galleryPhoto(id));
-  }
-
-  // About section (super_admin only)
-  async getAboutSection(): Promise<{ data: { main_image: string | null; overlapping_image: string | null } }> {
-    const response = await this.client.get<{ data: { main_image: string | null; overlapping_image: string | null } }>(
-      endpoints.aboutSection
-    );
-    return response.data;
-  }
-
-  async updateAboutSection(data: {
-    main_image?: File | null;
-    overlapping_image?: File | null;
-  }): Promise<{ data: { main_image: string | null; overlapping_image: string | null } }> {
-    const body = this.buildAboutFormData({
-      main_image: data.main_image ?? undefined,
-      overlapping_image: data.overlapping_image ?? undefined,
-    });
-    // POST required for file upload – PHP does not populate $_FILES on PUT
-    const response = await this.client.post<{ data: { main_image: string | null; overlapping_image: string | null } }>(
-      endpoints.aboutSection,
-      body
-    );
-    return response.data;
-  }
-
-  // Auth page background image (public GET; admin uses same to load current)
-  async getAuthPage(): Promise<{ data: { background_image: string | null } }> {
-    const response = await this.client.get<{ data: { background_image: string | null } }>(
-      endpoints.authPage
-    );
-    return response.data;
-  }
-
-  async updateAuthPage(data: { image?: File | null }): Promise<{ data: { background_image: string | null } }> {
-    const body = this.buildAboutFormData({ image: data.image ?? undefined });
-    const response = await this.client.post<{ data: { background_image: string | null } }>(
-      endpoints.authPage,
-      body
-    );
-    return response.data;
-  }
-
-  // Community section (super_admin only)
-  async getCommunitySection(): Promise<{ data: { image: string | null } }> {
-    const response = await this.client.get<{ data: { image: string | null } }>(
-      endpoints.communitySection
-    );
-    return response.data;
-  }
-
-  async updateCommunitySection(data: { image?: File | null }): Promise<{ data: { image: string | null } }> {
-    const body = this.buildAboutFormData({ image: data.image ?? undefined });
-    const response = await this.client.post<{ data: { image: string | null } }>(
-      endpoints.communitySection,
-      body
-    );
-    return response.data;
-  }
-
-  // Health section (super_admin only)
-  async getHealthSection(): Promise<{ data: { main_image: string | null; overlapping_image: string | null } }> {
-    const response = await this.client.get<{ data: { main_image: string | null; overlapping_image: string | null } }>(
-      endpoints.healthSection
-    );
-    return response.data;
-  }
-
-  async updateHealthSection(data: {
-    main_image?: File | null;
-    overlapping_image?: File | null;
-  }): Promise<{ data: { main_image: string | null; overlapping_image: string | null } }> {
-    const body = this.buildAboutFormData({
-      main_image: data.main_image ?? undefined,
-      overlapping_image: data.overlapping_image ?? undefined,
-    });
-    const response = await this.client.post<{ data: { main_image: string | null; overlapping_image: string | null } }>(
-      endpoints.healthSection,
-      body
-    );
-    return response.data;
-  }
-
-  // Homepage hero slider (super_admin only)
-  async getHeroSlides(): Promise<AboutListResponse<HeroSlide>> {
-    const response = await this.client.get<AboutListResponse<HeroSlide>>(
-      endpoints.heroSlides
-    );
-    return response.data;
-  }
-
-  async createHeroSlide(data: {
-    image: File;
-    title: string;
-    subtitle?: string | null;
-    description?: string | null;
-    primary_button_label?: string | null;
-    primary_button_url?: string | null;
-    secondary_button_label?: string | null;
-    secondary_button_url?: string | null;
-    sort_order?: number;
-    is_active?: boolean;
-  }): Promise<{ data: HeroSlide }> {
-    const body = this.buildAboutFormData({
-      image: data.image,
-      title: data.title,
-      subtitle: data.subtitle ?? '',
-      description: data.description ?? '',
-      primary_button_label: data.primary_button_label ?? '',
-      primary_button_url: data.primary_button_url ?? '',
-      secondary_button_label: data.secondary_button_label ?? '',
-      secondary_button_url: data.secondary_button_url ?? '',
-      sort_order: data.sort_order ?? 0,
-      is_active: data.is_active === true ? 1 : 0,
-    });
-    const response = await this.client.post<{ data: HeroSlide }>(
-      endpoints.heroSlides,
-      body
-    );
-    return response.data;
-  }
-
-  async updateHeroSlide(
-    id: number,
-    data: {
-      image?: File | null;
-      title?: string;
-      subtitle?: string | null;
-      description?: string | null;
-      primary_button_label?: string | null;
-      primary_button_url?: string | null;
-      secondary_button_label?: string | null;
-      secondary_button_url?: string | null;
-      sort_order?: number;
-      is_active?: boolean;
-    }
-  ): Promise<{ data: HeroSlide }> {
-    const body = this.buildAboutFormData(
-      {
-        image: data.image ?? undefined,
-        title: data.title,
-        subtitle: data.subtitle,
-        description: data.description,
-        primary_button_label: data.primary_button_label,
-        primary_button_url: data.primary_button_url,
-        secondary_button_label: data.secondary_button_label,
-        secondary_button_url: data.secondary_button_url,
-        sort_order: data.sort_order,
-        is_active: data.is_active === true ? 1 : data.is_active === false ? 0 : undefined,
-      },
-      true
-    );
-    const response = await this.client.put<{ data: HeroSlide }>(
-      endpoints.heroSlide(id),
-      body
-    );
-    return response.data;
-  }
-
-  async deleteHeroSlide(id: number): Promise<void> {
-    await this.client.delete(endpoints.heroSlide(id));
   }
 
   // Notices (scrolling bar; super_admin sees all)
